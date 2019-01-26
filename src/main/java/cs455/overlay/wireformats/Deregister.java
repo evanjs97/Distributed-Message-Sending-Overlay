@@ -1,16 +1,16 @@
 package cs455.overlay.wireformats;
 
-public class Deregister implements Event{
-	private final int type = 1;
+import java.io.DataInputStream;
+import java.io.IOException;
 
+public class Deregister extends MessageNodeEvent implements Event {
 
-	@Override
-	public int getType() {
-		return 0;
+	public Deregister(String ip, int port) {
+		super(1, ip, port);
 	}
 
-	@Override
-	public byte[] getBytes() {
-		return new byte[0];
+	public Deregister(DataInputStream din) throws IOException {
+		super(din);
 	}
+
 }

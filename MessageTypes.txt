@@ -1,0 +1,46 @@
+Message Type (int): REGISTER_REQUEST
+IP address (String)
+Port number (int)
+
+Message Type (int): REGISTER_RESPONSE
+Status Code (byte): SUCCESS or FAILURE
+Additional Info (String):
+
+Message Type: DEREGISTER_REQUEST
+Node IP address:
+Node Port number:
+
+Message Type: DEREGISTER_REQUEST_ERROR
+Additional Info (String):
+
+Message Type: MESSAGING_NODES_LIST
+Number of peer messaging nodes: X
+Messaging node1 Info
+Messaging node2 Info
+…..
+Messaging nodeX Info
+
+Message Type: Link_Weights
+Number of links: L
+Linkinfo1
+Linkinfo2
+...
+LinkinfoL
+
+Message Type: TASK_INITIATE
+Rounds: X
+
+Message Type: TASK_COMPLETE
+Node IP address:
+Node Port number:
+
+Message Type: PULL_TRAFFIC_SUMMARY
+
+Message Type: TRAFFIC_SUMMARY
+Node IP address:
+Node Port number:
+Number of messages sent
+Summation of sent messages
+Number of messages received
+Summation of received messages
+Number of messages relayed
