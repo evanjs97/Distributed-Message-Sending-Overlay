@@ -25,6 +25,9 @@ public class Node {
 		address = tcpServerThread.getAddress();
 		iAddress = tcpServerThread.getInetAddress();
 		this.port  = tcpServerThread.getLocalPort();
+		System.out.println("Node Created!");
+		new Thread(tcpServerThread).start();
+
 	}
 
 }

@@ -1,6 +1,7 @@
 package cs455.overlay.node;
 
 import java.io.*;
+import java.util.Scanner;
 
 
 public class Registry extends Node{
@@ -11,6 +12,7 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	public Registry(int port) throws IOException {
+
 		super(port);
 	}
 
@@ -42,7 +44,19 @@ public class Registry extends Node{
 				System.out.println("Error: Invalid port number, port must be in the range 1024-65535");
 				System.exit(1);
 			}
+			System.out.println("Creating Registry!");
 			Registry registry = new Registry(port);
+
+			boolean wait = true;
+			Scanner scanner = new Scanner(System.in);
+			while(wait) {
+				if(scanner.hasNext()) {
+					String next = scanner.next();
+					if(next.equals("quit")) {
+						break;
+					}
+				}
+			}
 		}catch (NumberFormatException e) {
 			System.out.println("Error: Port must be a valid integer.");
 			System.exit(1);

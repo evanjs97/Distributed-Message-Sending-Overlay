@@ -24,7 +24,7 @@ public class MessageNodeEvent implements Event{
 
 	/**
 	 * Marshall/encode the register message for transfer over TCP
-	 * N
+	 * Order of retrieval is int=type, String=address, int=port
 	 * @return a byte[] representation of this register object
 	 */
 	@Override

@@ -13,5 +13,6 @@ public class Register extends MessageNodeEvent implements Event{
 
 	public Register(DataInputStream din) throws IOException{
 		super(din);
+		System.out.println("Register Message Recieved from: " + this.ip + " on port: " + this.port);
 	}
 }
