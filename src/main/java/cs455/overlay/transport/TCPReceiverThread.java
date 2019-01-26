@@ -1,9 +1,10 @@
 package cs455.overlay.transport;
 
+import cs455.overlay.wireformats.EventFactory;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 public class TCPReceiverThread implements Runnable {
 
@@ -18,17 +19,24 @@ public class TCPReceiverThread implements Runnable {
 	@Override
 	public void run() {
 		int dataLength;
-		while(socket != null) {
-			try {
-				dataLength = din.readInt();
+		while(true) {
+			while (socket != null) {
+				try {
+					dataLength = din.readInt();
 
-				byte[] data = new byte[dataLength];
-				din.readFully(data, 0, dataLength);
-
-			}catch(IOException ioe) {
-				System.out.println(ioe.getMessage());
-				break;
+					byte[] data = new byte[dataLength];
+					din.readFully(data, 0, dataLength);
+					EventFactory.getInstance().getEvent(data);
+				} catch (IOException ioe) {
+					System.out.println(ioe.getMessage());
+					break;
+				}
 			}
 		}
+//		try {
+//			socket.close();
+//		}catch(IOException ioe) {
+//			System.out.println(ioe.getMessage());
+//		}
 	}
 }

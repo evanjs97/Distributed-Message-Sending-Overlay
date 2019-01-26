@@ -1,19 +1,18 @@
 package cs455.overlay.node;
 
+import cs455.overlay.transport.TCPSender;
+import cs455.overlay.wireformats.Register;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
-public class MessagingNode {
-	private ServerSocket serverSocket;
-	private String address;
-	private InetAddress iAddress;
-	private int port;
+public class MessagingNode extends Node{
+
+
+
 	private String regName;
 	private int regPort;
-	private Socket regSocket;
 
 
 	/**
@@ -21,19 +20,14 @@ public class MessagingNode {
 	 * @param regName the hostname of the registry
 	 * @param regPort the port of the registry to try to connect over
 	 */
-	public MessagingNode(String regName, int regPort) {
-		openServerSocket();
-		address = serverSocket.getInetAddress().getHostAddress();
-		port  = serverSocket.getLocalPort();
+	public MessagingNode(String regName, int regPort) throws IOException{
+		super(0);
+
 		this.regName = regName;
 		this.regPort = regPort;
+
 		register();
-		//runServerNode();
-		try {
-			regSocket = new Socket(regName, regPort, iAddress, port);
-		}catch(IOException e) {
-			System.out.println("Failed to open socket to Registry " + regName + " on port " + regPort);
-		}
+
 	}
 
 	/**
@@ -41,72 +35,39 @@ public class MessagingNode {
 	 * @param regName the hostname of the registry
 	 * @param regPort the port of the registry to try to connect over
 	 */
-	public MessagingNode(String regName, int regPort, int port) {
+	public MessagingNode(String regName, int regPort, int port) throws IOException {
+		super(port);
 		this.regName = regName;
 		this.regPort = regPort;
-		openServerSocket();
-		iAddress = serverSocket.getInetAddress();
-		address = iAddress.getHostAddress();
-		this.port  = port;
-		//runServerNode();try {
-		try{
-			regSocket = new Socket(regName, regPort, iAddress, port);
-		}catch(IOException e) {
-			System.out.println("Failed to open socket to Registry " + regName + " on port " + regPort);
-			System.exit(1);
-		}
 
 		register();
-		try{
-			regSocket.close();
-			serverSocket.close();
-		}catch(IOException ioE) {
-			System.out.println("Failed to close socket.");
-		}
+//		try{
+//			regSocket = new Socket(regName, regPort, iAddress, port);
+//		}catch(IOException e) {
+//			System.out.println("Failed to open socket to Registry " + regName + " on port " + regPort);
+//			System.exit(1);
+//		}
+
+
+//		try{
+//			regSocket.close();
+//			serverSocket.close();
+//		}catch(IOException ioE) {
+//			System.out.println("Failed to close socket.");
+//		}
 
 	}
 
-
-	public void runServerNode() {
-		while(true) {
-			try{
-				Socket s = serverSocket.accept();
-
-//				Runnable connection = new NodeConnection(s);
-//				new Thread(connection).start();
-			}catch(Exception e) {
-
-			}
-		}
-	}
-
-	private void register() {
+	private void register() throws IOException{
 		System.out.println("Ready to register");
-		boolean registered = false;
-		while(!registered) {
-			try {
-				DataOutputStream out = new DataOutputStream(regSocket.getOutputStream());
-				out.writeUTF("Registering node");
-				out.flush();
-
-				out.close();
-				System.out.println("Sent registration message");
-				registered = true;
-			} catch (IOException ioE) {
-				System.out.println("MessagingNode at " + address + " failed to connect to " + regName);
-			}
-		}
+		Socket socket = new Socket(regName, regPort);
+		new TCPSender(socket).sendData(new Register(this.address, this.port).getBytes());
+		socket.close();
 	}
 
-	private void openServerSocket() {
-			try{
-				this.serverSocket = new ServerSocket(0);
-				return;
-			}catch(Exception e) {
-			}
-	}
 
-	public static void main(String[] args) {
+
+	public static void main(String[] args) throws IOException{
 		if(args.length < 2) {
 			System.out.println("Error: Please specify a hostname and port number.");
 			System.exit(1);
