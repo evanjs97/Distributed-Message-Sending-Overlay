@@ -9,17 +9,25 @@ public class TCPServerThread implements Runnable{
 	ServerSocket serverSocket;
 	int port;
 
-
+	/**
+	 * TCPServerThread constructor creates new Server thread
+	 * @param port to open server socket for, use '0' for automatic allocation
+	 */
 	public TCPServerThread(int port) {
 		openServerSocket(port);
-		this.serverSocket.getLocalPort();
+		this.port = this.serverSocket.getLocalPort();
 	}
 
+	/**
+	 * openServerSocket opens ServerSocket over port
+	 * @param port to open ServerSocket over, pass '0' to automatically allocate
+	 */
 	private void openServerSocket(int port) {
 		try{
 			this.serverSocket = new ServerSocket(port);
 			return;
-		}catch(Exception e) {
+		}catch(IOException ioe) {
+			System.out.println(ioe.getMessage());
 		}
 	}
 
@@ -35,6 +43,10 @@ public class TCPServerThread implements Runnable{
 		return serverSocket.getLocalPort();
 	}
 
+	/**
+	 * run method for thread
+	 * blocks till connection made, then open TCPReceiverThread over that socket
+	 */
 	@Override
 	public void run() {
 		while (true) {

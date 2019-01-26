@@ -11,11 +11,21 @@ public class TCPReceiverThread implements Runnable {
 	private Socket socket;
 	private DataInputStream din;
 
+	/**
+	 * TCPReceiverThread creates new receiver thread instance
+	 * @param socket the socket to receive messages over
+	 * @throws IOException
+	 */
 	public TCPReceiverThread(Socket socket) throws IOException {
 		this.socket = socket;
 		this.din = new DataInputStream(socket.getInputStream());
 	}
 
+	/**
+	 * run method
+	 * reads from socket while not null
+	 * send event to EventFactory after reading
+	 */
 	@Override
 	public void run() {
 		int dataLength;

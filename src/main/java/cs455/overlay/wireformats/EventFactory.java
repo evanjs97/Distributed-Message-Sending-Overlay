@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Singleton Instance Design Pattern
@@ -11,18 +13,28 @@ import java.io.IOException;
  */
 public class EventFactory {
 	private static EventFactory eventFactory;
-
+	private Queue<Event> eventQueue = new LinkedList<>();
 	/**
 	 * private constructor can only be called from this class
 	 */
 	private EventFactory(){}
 
 	/**
-	 *
+	 * creates instance of EventFactory on class creation
+	 * @return
 	 */
 	static {
 		eventFactory = new EventFactory();
 	}
+
+	public boolean hasEvent() {
+		return eventQueue.isEmpty();
+	}
+
+	public Event nextEvent() {
+		return eventQueue.poll();
+	}
+
 
 	public static EventFactory getInstance() {
 		return eventFactory;

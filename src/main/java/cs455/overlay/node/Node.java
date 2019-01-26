@@ -15,6 +15,11 @@ public class Node {
 	protected int port;
 	private EventFactory eventFactory;
 
+	/**
+	 * Node constructor to be inherited by MessagingNode and Registry
+	 * @param port is the port to open a TCPServerThread over, pass '0' for automatic allocation
+	 * @throws IOException if TCPServerThread fails to create ServerSocket
+	 */
 	public Node(int port) throws IOException{
 		tcpServerThread = new TCPServerThread(port);
 		address = tcpServerThread.getAddress();

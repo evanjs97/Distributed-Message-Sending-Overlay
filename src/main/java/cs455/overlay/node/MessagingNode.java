@@ -58,6 +58,12 @@ public class MessagingNode extends Node{
 
 	}
 
+	/**
+	 * register node in registry
+	 * creates socket on regName and regPort
+	 * creates TCPSender to send Register message to Registry
+	 * @throws IOException
+	 */
 	private void register() throws IOException{
 		System.out.println("Ready to register");
 		Socket socket = new Socket(regName, regPort);
@@ -66,7 +72,12 @@ public class MessagingNode extends Node{
 	}
 
 
-
+	/**
+	 * main method for MessagingNode mostly does error checking and starts MessagingNode
+	 * @param args [0] = hostname of registry, [1] = port that registry is listening on
+	 *             if [2] is specified node will open over that port specified by [2]
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException{
 		if(args.length < 2) {
 			System.out.println("Error: Please specify a hostname and port number.");
@@ -80,7 +91,11 @@ public class MessagingNode extends Node{
 					System.out.println("Error: Invalid port number, port must be in the range 1024-65535");
 					System.exit(1);
 				}
-				MessagingNode messageNode = new MessagingNode(hostname, port,3005);
+				if(args.length > 2) {
+					MessagingNode messageNode = new MessagingNode(hostname, port, Integer.parseInt(args[2]));
+				}else {
+					MessagingNode messageNode = new MessagingNode(hostname, port);
+				}
 			}catch (NumberFormatException e) {
 				System.out.println("Error: Port must be a valid integer.");
 				System.exit(1);
