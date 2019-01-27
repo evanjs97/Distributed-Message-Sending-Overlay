@@ -21,8 +21,6 @@ public class RegisterResponse implements Event{
 		byte[] identifierBytes = new byte[identifierLength];
 		din.readFully(identifierBytes);
 		info = new String(identifierBytes);
-
-		System.out.println("Register: " + info);
 	}
 
 	@Override
@@ -60,6 +58,14 @@ public class RegisterResponse implements Event{
 		dout.close();
 		return marshalledData;
 
+	}
+
+	public byte getStatus() {
+		return this.status;
+	}
+
+	public String getInfo() {
+		return this.info;
 	}
 
 

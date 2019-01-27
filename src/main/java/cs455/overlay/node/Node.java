@@ -33,6 +33,12 @@ public abstract class Node {
 
 	}
 
+	/**
+	 * onEvent abstract method to be overridden by all types of nodes
+	 * @param event the event to handle
+	 * @param socket the socket the event was received over
+	 * @throws IOException
+	 */
 	public abstract void onEvent(Event event, Socket socket) throws IOException;
 
 }

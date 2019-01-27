@@ -1,19 +1,24 @@
 package cs455.overlay.wireformats;
 
 import java.io.*;
-import java.net.InetAddress;
 
 /**
  * Note that type of register message is 0
  */
 public class Register extends MessageNodeEvent implements Event{
 
-	public Register(String ip, int port) {
-		super(0, ip, port);
+	/**
+	 *
+	 * @param ip
+	 * @param port
+	 * @param type type 0 = register, type 1 = deregister
+	 */
+	public Register(String ip, int port, int type) {
+		super(Math.min(1, type), ip, port);
 	}
 
-	public Register(DataInputStream din) throws IOException{
-		super(din);
+	public Register(DataInputStream din, int type) throws IOException{
+		super(din, type);
 
 	}
 }

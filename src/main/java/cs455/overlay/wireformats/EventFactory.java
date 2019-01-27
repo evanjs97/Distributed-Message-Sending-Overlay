@@ -55,10 +55,10 @@ public class EventFactory {
 		Event e = null;
 		switch (type) {
 			case 0:
-				e = new Register(din);
+				e = new Register(din, type);
 				break;
 			case 1:
-				e = new Deregister(din);
+				e = new Register(din, type);
 				break;
 			case 2:
 				e = new RegisterResponse(din);

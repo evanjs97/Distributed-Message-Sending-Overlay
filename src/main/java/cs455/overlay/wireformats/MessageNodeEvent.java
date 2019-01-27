@@ -13,13 +13,14 @@ public class MessageNodeEvent implements Event{
 		this.port = port;
 	}
 
-	public MessageNodeEvent(DataInputStream din) throws IOException{
+	public MessageNodeEvent(DataInputStream din, int type) throws IOException{
 		int identifierLength = din.readInt();
 		byte[] identifierBytes = new byte[identifierLength];
 		din.readFully(identifierBytes);
 
 		this.ip = new String(identifierBytes);
 		this.port = din.readInt();
+		this.type = type;
 	}
 
 	/**

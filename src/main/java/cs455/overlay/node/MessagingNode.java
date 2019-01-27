@@ -3,10 +3,11 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.RegisterResponse;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class MessagingNode extends Node{
 
@@ -42,20 +43,6 @@ public class MessagingNode extends Node{
 		this.regPort = regPort;
 
 		register();
-//		try{
-//			regSocket = new Socket(regName, regPort, iAddress, port);
-//		}catch(IOException e) {
-//			System.out.println("Failed to open socket to Registry " + regName + " on port " + regPort);
-//			System.exit(1);
-//		}
-
-
-//		try{
-//			regSocket.close();
-//			serverSocket.close();
-//		}catch(IOException ioE) {
-//			System.out.println("Failed to close socket.");
-//		}
 
 	}
 
@@ -66,14 +53,48 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void register() throws IOException{
-		System.out.println("Ready to register");
+		System.out.println("Registering...");
 		Socket socket = new Socket(regName, regPort);
-		new TCPSender(socket).sendData(new Register(this.address, this.port).getBytes());
+		new TCPSender(socket).sendData(new Register(this.address, this.port, 0).getBytes());
 		socket.close();
 	}
 
-	public void onEvent(Event event, Socket socket) throws IOException{
+	private void deregister() throws IOException{
+		System.out.println("Deregistering...");
+		Socket socket = new Socket(regName, regPort);
+		new TCPSender(socket).sendData(new Register(this.address,this.port, 1).getBytes());
+		socket.close();
+	}
 
+	/**
+	 * onEvent method accepts an event and handles it based on its type
+	 * @param event a message received event
+	 * @param socket the socket that the message was received over
+	 * @throws IOException
+	 */
+	public void onEvent(Event event, Socket socket) throws IOException{
+		switch(event.getType()) {
+			case 2:
+				RegisterResponse regRes = (RegisterResponse) event;
+				System.out.println("Response received from register: status: " + regRes.getStatus() + ", " + regRes.getInfo());
+		}
+	}
+
+	public void commandHandler() throws IOException{
+		Scanner scan = new Scanner(System.in);
+		while(true) {
+			while(scan.hasNext()) {
+				String command = scan.nextLine();
+				switch(command) {
+					case "quit":
+						System.exit(0);
+					case "exit-overlay":
+						deregister();
+						break;
+
+				}
+			}
+		}
 	}
 
 
@@ -98,9 +119,12 @@ public class MessagingNode extends Node{
 				}
 				if(args.length > 2) {
 					MessagingNode messageNode = new MessagingNode(hostname, port, Integer.parseInt(args[2]));
+					messageNode.commandHandler();
 				}else {
 					MessagingNode messageNode = new MessagingNode(hostname, port);
+					messageNode.commandHandler();
 				}
+
 			}catch (NumberFormatException e) {
 				System.out.println("Error: Port must be a valid integer.");
 				System.exit(1);
