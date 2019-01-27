@@ -20,16 +20,6 @@ public class Registry extends Node{
 //
 //	}
 
-//	private void openServerSocket() {
-//		for(int i = 1024; i < 65536; i++) {
-//			try{
-//				this.serverSocket = new ServerSocket(i);
-//				return;
-//			}catch(Exception e) {
-//				continue;
-//			}
-//		}
-//	}
 
 	/**
 	 * main method for Registry class error checks and creates Registry
@@ -47,16 +37,16 @@ public class Registry extends Node{
 			System.out.println("Creating Registry!");
 			Registry registry = new Registry(port);
 
-			boolean wait = true;
-			Scanner scanner = new Scanner(System.in);
-			while(wait) {
-				if(scanner.hasNext()) {
-					String next = scanner.next();
-					if(next.equals("quit")) {
-						break;
-					}
-				}
-			}
+//			boolean wait = true;
+//			Scanner scanner = new Scanner(System.in);
+//			while(wait) {
+//				if(scanner.hasNext()) {
+//					String next = scanner.next();
+//					if(next.equals("quit")) {
+//						break;
+//					}
+//				}
+//			}
 		}catch (NumberFormatException e) {
 			System.out.println("Error: Port must be a valid integer.");
 			System.exit(1);
