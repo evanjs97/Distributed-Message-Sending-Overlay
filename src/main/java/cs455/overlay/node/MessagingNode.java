@@ -59,8 +59,12 @@ public class MessagingNode extends Node{
 		socket.close();
 	}
 
+	/**
+	 * deregister sends deregister request to register
+	 * @throws IOException
+	 */
 	private void deregister() throws IOException{
-		System.out.println("Deregistering...");
+		System.out.println("De-registering...");
 		Socket socket = new Socket(regName, regPort);
 		new TCPSender(socket).sendData(new Register(this.address,this.port, 1).getBytes());
 		socket.close();
@@ -80,6 +84,13 @@ public class MessagingNode extends Node{
 		}
 	}
 
+	/**
+	 * command handler for messaging node
+	 * Valid Commands:
+	 * quit: stops process and exits JVM
+	 * exit-overlay: sends deregister request to register
+	 * @throws IOException
+	 */
 	public void commandHandler() throws IOException{
 		Scanner scan = new Scanner(System.in);
 		while(true) {

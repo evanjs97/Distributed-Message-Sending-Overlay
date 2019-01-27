@@ -48,7 +48,12 @@ public class Registry extends Node{
 		new TCPSender(sender).sendData(new RegisterResponse(status, info).getBytes());
 	}
 
-
+	/**
+	 * deregister's node (removes from map), if node is registered and ip is valid
+	 * @param dreg the node to deregister
+	 * @param socket the socket the dreg request was received over
+	 * @throws IOException
+	 */
 	private void deregisterNode(Register dreg, Socket socket) throws IOException {
 		System.out.println("Deregister request received from: " + dreg.getIp() +" on port: " + dreg.getPort());
 		Integer port = registeredNodes.get(dreg.getIp());
@@ -61,6 +66,9 @@ public class Registry extends Node{
 		}
 	}
 
+	/**
+	 * Lists all registered nodes in format 'ip, port'
+	 */
 	public void listNodes() {
 		Iterator nodeIter = registeredNodes.entrySet().iterator();
 		while(nodeIter.hasNext()) {
@@ -69,6 +77,14 @@ public class Registry extends Node{
 		}
 	}
 
+
+	/**
+	 * handles commands for the registry
+	 * Valid Commands:
+	 * quit: stops process and exits JVM
+	 * list-messaging-nodes: lists all registered nodes in format 'ip, port'
+	 * @throws IOException
+	 */
 	public void commandHandler() throws IOException{
 		Scanner scan = new Scanner(System.in);
 		while(true) {
