@@ -1,6 +1,8 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
+import cs455.overlay.util.OverlayCreator;
+import cs455.overlay.util.OverlayNode;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
@@ -13,6 +15,7 @@ import java.util.*;
 public class Registry extends Node{
 
 	private Map<String, Integer> registeredNodes;
+	private OverlayCreator overlay;
 	/**
 	 * Registry constructor creates new Registry on current machine listening over specified port
 	 * @param port
@@ -21,6 +24,7 @@ public class Registry extends Node{
 	public Registry(int port) throws IOException {
 		super(port);
 		registeredNodes = Collections.synchronizedMap(new HashMap<String, Integer>());
+		overlay = new OverlayCreator();
 	}
 
 
@@ -69,12 +73,24 @@ public class Registry extends Node{
 	/**
 	 * Lists all registered nodes in format 'ip, port'
 	 */
-	public void listNodes() {
+	private void listNodes() {
 		Iterator nodeIter = registeredNodes.entrySet().iterator();
 		while(nodeIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) nodeIter.next();
 			System.out.println(tuple.getKey() + ", " + tuple.getValue());
 		}
+	}
+
+	private void createOverlay(int connectionCount) {
+		Iterator nodeIter = registeredNodes.entrySet().iterator();
+		OverlayNode[] nodes = new OverlayNode[registeredNodes.size()];
+		int index = 0;
+		while(nodeIter.hasNext()) {
+			Map.Entry tuple = (Map.Entry) nodeIter.next();
+			nodes[index] = new OverlayNode(tuple.getKey().toString(),(Integer)tuple.getValue(), connectionCount);
+			index++;
+		}
+		overlay.createOverlay(nodes, connectionCount);
 	}
 
 
@@ -97,7 +113,9 @@ public class Registry extends Node{
 						listNodes();
 						break;
 					case "setup-overlay":
-
+						//System.out.println("TEST: " + scan.next());
+						createOverlay(scan.nextInt());
+						scan.nextLine();
 						break;
 
 				}
