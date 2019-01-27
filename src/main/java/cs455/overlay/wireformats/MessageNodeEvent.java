@@ -52,4 +52,8 @@ public class MessageNodeEvent implements Event{
 	@Override
 	public int getType() { return this.type; }
 
+	public String getIp() { return this.ip; }
+
+	public int getPort() { return this.port; }
+
 }

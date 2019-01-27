@@ -1,19 +1,23 @@
 package cs455.overlay.transport;
 
+import cs455.overlay.node.Node;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class TCPServerThread implements Runnable{
-	ServerSocket serverSocket;
-	int port;
+	private ServerSocket serverSocket;
+	private int port;
+	private Node node;
 
 	/**
 	 * TCPServerThread constructor creates new Server thread
 	 * @param port to open server socket for, use '0' for automatic allocation
 	 */
-	public TCPServerThread(int port) {
+	public TCPServerThread(int port, Node node) {
+		this.node = node;
 		openServerSocket(port);
 		this.port = this.serverSocket.getLocalPort();
 	}
@@ -24,7 +28,7 @@ public class TCPServerThread implements Runnable{
 	 */
 	private void openServerSocket(int port) {
 		try{
-			this.serverSocket = new ServerSocket(port);
+			this.serverSocket = new ServerSocket(port, 0, java.net.InetAddress.getLocalHost());
 			return;
 		}catch(IOException ioe) {
 			System.out.println(ioe.getMessage());
@@ -53,7 +57,7 @@ public class TCPServerThread implements Runnable{
 			try {
 				Socket socket = serverSocket.accept();
 				System.out.println("Accepted Message");
-				new Thread(new TCPReceiverThread(socket)).start();
+				new Thread(new TCPReceiverThread(socket, node)).start();
 			} catch (IOException ioe) {
 				System.out.println(ioe.getMessage());
 			}

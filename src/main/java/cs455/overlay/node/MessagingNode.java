@@ -1,6 +1,7 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
+import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Register;
 
 import java.io.DataOutputStream;
@@ -69,6 +70,10 @@ public class MessagingNode extends Node{
 		Socket socket = new Socket(regName, regPort);
 		new TCPSender(socket).sendData(new Register(this.address, this.port).getBytes());
 		socket.close();
+	}
+
+	public void onEvent(Event event) throws IOException{
+
 	}
 
 

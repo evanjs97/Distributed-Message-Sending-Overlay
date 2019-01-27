@@ -1,5 +1,7 @@
 package cs455.overlay.transport;
 
+import cs455.overlay.node.Node;
+import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.EventFactory;
 
 import java.io.DataInputStream;
@@ -10,13 +12,15 @@ public class TCPReceiverThread implements Runnable {
 
 	private Socket socket;
 	private DataInputStream din;
+	private Node node;
 
 	/**
 	 * TCPReceiverThread creates new receiver thread instance
 	 * @param socket the socket to receive messages over
 	 * @throws IOException
 	 */
-	public TCPReceiverThread(Socket socket) throws IOException {
+	public TCPReceiverThread(Socket socket, Node node) throws IOException {
+		this.node = node;
 		this.socket = socket;
 		this.din = new DataInputStream(socket.getInputStream());
 	}
@@ -30,16 +34,19 @@ public class TCPReceiverThread implements Runnable {
 	public void run() {
 		int dataLength;
 		//while(true) {
-			while (socket != null) {
+			while (socket != null ) {
 				try {
 					dataLength = din.readInt();
 
 					byte[] data = new byte[dataLength];
 					din.readFully(data, 0, dataLength);
-					EventFactory.getInstance().getEvent(data);
+
+					Event event = EventFactory.getInstance().getEvent(data);
+					//socket.close();
+					node.onEvent(event);
 					break;
 				} catch (IOException ioe) {
-					System.out.println(ioe.getMessage());
+					System.out.println(ioe.getMessage() + " " + ioe.getLocalizedMessage());
 					break;
 				}
 			}

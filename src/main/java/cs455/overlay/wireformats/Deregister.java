@@ -2,6 +2,7 @@ package cs455.overlay.wireformats;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class Deregister extends MessageNodeEvent implements Event {
 

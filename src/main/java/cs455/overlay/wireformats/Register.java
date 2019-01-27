@@ -1,6 +1,7 @@
 package cs455.overlay.wireformats;
 
 import java.io.*;
+import java.net.InetAddress;
 
 /**
  * Note that type of register message is 0
@@ -13,6 +14,6 @@ public class Register extends MessageNodeEvent implements Event{
 
 	public Register(DataInputStream din) throws IOException{
 		super(din);
-		System.out.println("Register Message Recieved from: " + this.ip + " on port: " + this.port);
+
 	}
 }

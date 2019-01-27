@@ -1,6 +1,12 @@
 package cs455.overlay.node;
 
+import cs455.overlay.transport.TCPSender;
+import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.Register;
+import cs455.overlay.wireformats.RegisterResponse;
+
 import java.io.*;
+import java.net.Socket;
 import java.util.Scanner;
 
 
@@ -12,13 +18,26 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	public Registry(int port) throws IOException {
-
 		super(port);
 	}
 
-//	private void registerNode(NodeRequest message) {
-//
-//	}
+	private void registerNode(Register reg) throws IOException{
+		System.out.println("Register Message Recieved from: " + reg.getIp() +" on port: " + reg.getPort());
+		//System.out.println("SOCKET INFO: " + socket.getInetAddress().getHostAddress());
+		byte b = 0;
+		Socket sender = new Socket(reg.getIp(),reg.getPort());
+		new TCPSender(sender).sendData(new RegisterResponse(b, "Successfully Registered!").getBytes());
+	}
+
+	public void onEvent(Event event) throws IOException{
+		switch (event.getType()) {
+			case 0:
+				Register reg = (Register) event;
+				registerNode(reg);
+				break;
+		}
+	}
+
 
 
 	/**

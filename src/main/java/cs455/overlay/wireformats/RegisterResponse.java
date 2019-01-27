@@ -1,5 +1,6 @@
 package cs455.overlay.wireformats;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 
 public class RegisterResponse implements Event{
@@ -12,8 +13,16 @@ public class RegisterResponse implements Event{
 		this.info = info;
 	}
 
-	public RegisterResponse(DataInputStream din) {
+	public RegisterResponse(DataInputStream din) throws IOException{
+		status = din.readByte();
 
+
+		int identifierLength = din.readInt();
+		byte[] identifierBytes = new byte[identifierLength];
+		din.readFully(identifierBytes);
+		info = new String(identifierBytes);
+
+		System.out.println("Register: " + info);
 	}
 
 	@Override
@@ -21,7 +30,9 @@ public class RegisterResponse implements Event{
 		return type;
 	}
 
+	public void unMarshall(DataInputStream din) throws IOException{
 
+	}
 
 	/**
 	 * Marshall/encode the registration response message for transfer over TCP
@@ -39,7 +50,7 @@ public class RegisterResponse implements Event{
 
 		byte[] infoBytes = info.getBytes();
 		int infoLength = infoBytes.length;
-		dout.write(infoLength);
+		dout.writeInt(infoLength);
 		dout.write(infoBytes);
 
 		dout.flush();
