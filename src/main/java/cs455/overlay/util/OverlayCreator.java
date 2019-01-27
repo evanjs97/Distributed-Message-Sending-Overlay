@@ -1,35 +1,33 @@
 package cs455.overlay.util;
 
 public class OverlayCreator {
-	private OverlayNode[] nodes;
+	//private OverlayNode[] nodes;
 
-	/**
-	 * sets this class with the specified overlay
-	 * @param nodes the overlay to set
-	 */
-	private void set(OverlayNode[] nodes) {
-		this.nodes = nodes;
-	}
+//	/**
+//	 * sets this class with the specified overlay
+//	 * @param nodes the overlay to set
+//	 */
+//	private void set(OverlayNode[] nodes) {
+//		this.nodes = nodes;
+//	}
 
 	/**
 	 * starts the chain of processes that spawn a new overlay
 	 * @param nodes the node list to create an overlay from
 	 * @param connectionCount the exact number of connections per node
 	 */
-	public void createOverlay(OverlayNode[] nodes, int connectionCount) {
+	public static void createOverlay(OverlayNode[] nodes, int connectionCount) {
 		if(nodes.length <= connectionCount || (nodes.length * connectionCount) % 2 != 0 || (connectionCount == 1 && nodes.length > 2)) {
 			System.out.println(nodes.length + " " + connectionCount);
 		}else {
 			setupOverlay(nodes, connectionCount);
-			set(nodes);
-			printOverlay();
 		}
 	}
 
 	/**
 	 * prints out the overlay of this class
 	 */
-	private void printOverlay() {
+	public static void printOverlay(OverlayNode[] nodes) {
 		for(OverlayNode node : nodes) {
 			System.out.println(node);
 		}
@@ -39,7 +37,7 @@ public class OverlayCreator {
 	 * clear the overlay specified
 	 * @param nodes the overlay to clear
 	 */
-	private void clearOverlay(OverlayNode[] nodes) {
+	public static void clearOverlay(OverlayNode[] nodes) {
 		for(OverlayNode node : nodes) {
 			node.clear();
 		}
@@ -52,7 +50,7 @@ public class OverlayCreator {
 	 * @param nodes the array of nodes to create connections between
 	 * @param connectionCount the exact number of connections each node must have
 	 */
-	private void setupOverlay(OverlayNode[] nodes, int connectionCount) {
+	private static void setupOverlay(OverlayNode[] nodes, int connectionCount) {
 		System.out.println("Setting up overlay");
 		for(int i = 0; i < nodes.length; i++) {
 			if(i == nodes.length-1) {

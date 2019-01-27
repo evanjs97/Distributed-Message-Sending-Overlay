@@ -15,7 +15,7 @@ import java.util.*;
 public class Registry extends Node{
 
 	private Map<String, Integer> registeredNodes;
-	private OverlayCreator overlay;
+	private OverlayNode[] overlay;
 	/**
 	 * Registry constructor creates new Registry on current machine listening over specified port
 	 * @param port
@@ -24,7 +24,6 @@ public class Registry extends Node{
 	public Registry(int port) throws IOException {
 		super(port);
 		registeredNodes = Collections.synchronizedMap(new HashMap<String, Integer>());
-		overlay = new OverlayCreator();
 	}
 
 
@@ -90,7 +89,9 @@ public class Registry extends Node{
 			nodes[index] = new OverlayNode(tuple.getKey().toString(),(Integer)tuple.getValue(), connectionCount);
 			index++;
 		}
-		overlay.createOverlay(nodes, connectionCount);
+		OverlayCreator.createOverlay(nodes, connectionCount);
+		this.overlay = nodes;
+		OverlayCreator.printOverlay(this.overlay);
 	}
 
 
