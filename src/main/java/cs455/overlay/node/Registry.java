@@ -66,7 +66,6 @@ public class Registry extends Node{
 		while(nodeIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) nodeIter.next();
 			System.out.println(tuple.getKey() + ", " + tuple.getValue());
-			nodeIter.remove();
 		}
 	}
 
