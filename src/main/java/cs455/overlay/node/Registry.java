@@ -7,11 +7,13 @@ import cs455.overlay.wireformats.RegisterResponse;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Scanner;
 
 
 public class Registry extends Node{
 
+	private HashMap<String, Integer> registeredNodes;
 	/**
 	 * Registry constructor creates new Registry on current machine listening over specified port
 	 * @param port
@@ -19,21 +21,30 @@ public class Registry extends Node{
 	 */
 	public Registry(int port) throws IOException {
 		super(port);
+		registeredNodes = new HashMap<String, Integer>();
 	}
 
-	private void registerNode(Register reg) throws IOException{
-		System.out.println("Register Message Recieved from: " + reg.getIp() +" on port: " + reg.getPort());
-		//System.out.println("SOCKET INFO: " + socket.getInetAddress().getHostAddress());
-		byte b = 0;
+	private void registerNode(Register reg, Socket socket) throws IOException{
+		System.out.println("Register request received from: " + reg.getIp() +" on port: " + reg.getPort() + " Socket Address: " + socket.getInetAddress().getHostAddress());
+		byte status = 0;
+		String info = "Successfully Registered!";
+
+		Integer port = registeredNodes.get(reg.getIp());
+		if(port != null || !reg.getIp().equals(socket.getInetAddress().getHostAddress())) {
+			status = 1;
+			info = "Registration failed, already registered";
+		}
+
+
 		Socket sender = new Socket(reg.getIp(),reg.getPort());
-		new TCPSender(sender).sendData(new RegisterResponse(b, "Successfully Registered!").getBytes());
+		new TCPSender(sender).sendData(new RegisterResponse(status, info).getBytes());
 	}
 
-	public void onEvent(Event event) throws IOException{
+	public void onEvent(Event event, Socket socket) throws IOException{
 		switch (event.getType()) {
 			case 0:
 				Register reg = (Register) event;
-				registerNode(reg);
+				registerNode(reg, socket);
 				break;
 		}
 	}

@@ -43,7 +43,7 @@ public class TCPReceiverThread implements Runnable {
 
 					Event event = EventFactory.getInstance().getEvent(data);
 					//socket.close();
-					node.onEvent(event);
+					node.onEvent(event, socket);
 					break;
 				} catch (IOException ioe) {
 					System.out.println(ioe.getMessage() + " " + ioe.getLocalizedMessage());

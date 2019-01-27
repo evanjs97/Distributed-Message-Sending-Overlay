@@ -72,7 +72,7 @@ public class MessagingNode extends Node{
 		socket.close();
 	}
 
-	public void onEvent(Event event) throws IOException{
+	public void onEvent(Event event, Socket socket) throws IOException{
 
 	}
 

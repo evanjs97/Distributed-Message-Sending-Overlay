@@ -33,6 +33,6 @@ public abstract class Node {
 
 	}
 
-	public abstract void onEvent(Event event) throws IOException;
+	public abstract void onEvent(Event event, Socket socket) throws IOException;
 
 }
