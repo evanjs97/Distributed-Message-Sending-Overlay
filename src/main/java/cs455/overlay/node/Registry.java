@@ -7,9 +7,7 @@ import cs455.overlay.wireformats.RegisterResponse;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class Registry extends Node{
@@ -63,6 +61,35 @@ public class Registry extends Node{
 		}
 	}
 
+	public void listNodes() {
+		Iterator nodeIter = registeredNodes.entrySet().iterator();
+		while(nodeIter.hasNext()) {
+			Map.Entry tuple = (Map.Entry) nodeIter.next();
+			System.out.println(tuple.getKey() + ", " + tuple.getValue());
+			nodeIter.remove();
+		}
+	}
+
+	public void commandHandler() throws IOException{
+		Scanner scan = new Scanner(System.in);
+		while(true) {
+			while(scan.hasNext()) {
+				String command = scan.next();
+				switch(command) {
+					case "quit":
+						System.exit(0);
+					case "list-messaging-nodes":
+						listNodes();
+						break;
+					case "setup-overlay":
+
+						break;
+
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * onEvent method accepts an event and handles it based on its type
@@ -102,6 +129,7 @@ public class Registry extends Node{
 			}
 			System.out.println("Creating Registry!");
 			Registry registry = new Registry(port);
+			registry.commandHandler();
 
 		}catch (NumberFormatException e) {
 			System.out.println("Error: Port must be a valid integer.");
