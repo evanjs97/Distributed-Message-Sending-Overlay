@@ -59,6 +59,8 @@ public class EventFactory {
 			case 4:
 				e = new Register(din, type);
 				break;
+			case 5:
+				e = new LinkWeights(din);
 		}
 		baInputStream.close();
 		din.close();

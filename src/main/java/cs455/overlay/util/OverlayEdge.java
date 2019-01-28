@@ -30,4 +30,8 @@ public class OverlayEdge {
 	public boolean getSend() {
 		return this.send;
 	}
+
+	public int getWeight() {
+		return weight;
+	}
 }
