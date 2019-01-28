@@ -4,10 +4,7 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.MessagingNodesList;
-import cs455.overlay.wireformats.Register;
-import cs455.overlay.wireformats.RegisterResponse;
+import cs455.overlay.wireformats.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -109,8 +106,13 @@ public class Registry extends Node{
 		}
 	}
 
-	private void sendLinkWeights(LinkedList<OverlayEdge> links) {
-
+	private void sendLinkWeights(LinkedList<OverlayEdge> links) throws IOException{
+		Iterator nodeIter = registeredNodes.entrySet().iterator();
+		while(nodeIter.hasNext()) {
+			Map.Entry tuple = (Map.Entry) nodeIter.next();
+			new TCPSender(new Socket(tuple.getKey().toString(), (Integer) tuple.getValue())).sendData(new LinkWeights(links).getBytes());
+		}
+		System.out.println("Sent all link weights.");
 	}
 
 
