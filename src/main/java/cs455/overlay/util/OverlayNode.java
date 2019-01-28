@@ -1,13 +1,15 @@
 package cs455.overlay.util;
 
 
+import java.util.ArrayList;
+
 public class OverlayNode {
 	private String ip;
 	private int port;
 	private int maxConnections;
 
-	private OverlayNode[] connections;
-	private OverlayEdge[] edges;
+	private ArrayList<OverlayNode> connections;
+	private ArrayList<OverlayEdge> edges;
 	private int size = 0;
 
 	/**
@@ -19,14 +21,15 @@ public class OverlayNode {
 	public OverlayNode(String ip, int port, int maxConnections) {
 		this.ip = ip;
 		this.port = port;
-		this.connections = new OverlayNode[maxConnections];
-		this.edges = new OverlayEdge[maxConnections];
+		this.connections = new ArrayList<>();
+		this.edges = new ArrayList<>();
 		this.maxConnections = maxConnections;
 	}
 
 	public OverlayNode(String ip, int port) {
 		this.ip = ip;
 		this.port = port;
+
 	}
 
 	/**
@@ -35,14 +38,18 @@ public class OverlayNode {
 	 * @param send whether this node has to initiate the connection, if true it initiates, if false other initiates
 	 */
 	public void addEdge(OverlayNode other, boolean send, int weight) {
-		if (size < edges.length){
-			edges[size] = new OverlayEdge(this, other, send, weight);
+		if (size < edges.size()){
+			edges.add(new OverlayEdge(this, other, send, weight));
 			size++;
 		}
 	}
 
+	public void addEdge(OverlayEdge edge) {
+		edges.add(edge);
+	}
+
 	public OverlayEdge getEdge(int index) {
-		return edges[index];
+		return edges.get(index);
 	}
 
 	public String getIp() {
@@ -53,7 +60,7 @@ public class OverlayNode {
 		return this.port;
 	}
 
-	public OverlayEdge[] getEdges() {
+	public ArrayList<OverlayEdge> getEdges() {
 		return edges;
 	}
 

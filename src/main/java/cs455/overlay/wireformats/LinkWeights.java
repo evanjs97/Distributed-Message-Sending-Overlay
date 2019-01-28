@@ -1,6 +1,7 @@
 package cs455.overlay.wireformats;
 
 import cs455.overlay.util.OverlayEdge;
+import cs455.overlay.util.OverlayNode;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -23,13 +24,21 @@ public class LinkWeights implements Event{
 
 			din.readFully(linkInfo);
 			String[] split = new String(linkInfo).split(" ");
-			links.add(new OverlayEdge());
+			String[] nodeA = split[0].split(":");
+			String[] nodeB = split[1].split(":");
+			OverlayNode A = new OverlayNode(nodeA[0], Integer.parseInt(nodeA[1]));
+			OverlayNode B = new OverlayNode(nodeB[0], Integer.parseInt(nodeB[1]));
+			links.add(new OverlayEdge(A,B,true,Integer.parseInt(split[2])));
 		}
 	}
 
 	@Override
 	public int getType() {
 		return type;
+	}
+
+	public LinkedList<OverlayEdge> getLinks() {
+		return links;
 	}
 
 	@Override

@@ -1,11 +1,9 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.ShortestPath;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.OverlayNode;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.MessagingNodesList;
-import cs455.overlay.wireformats.Register;
-import cs455.overlay.wireformats.RegisterResponse;
+import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -18,6 +16,7 @@ public class MessagingNode extends Node{
 	private ConcurrentLinkedQueue<Socket> neighbors;
 	private String regName;
 	private int regPort;
+	private ShortestPath graph;
 
 
 	/**
@@ -35,7 +34,7 @@ public class MessagingNode extends Node{
 
 	}
 
-	/**
+	/**new
 	 * MessagingNode test constructor, allows specification of port for MessagingNode
 	 * @param regName the hostname of the registry
 	 * @param regPort the port of the registry to try to connect over
@@ -108,6 +107,11 @@ public class MessagingNode extends Node{
 				Register reg = (Register) event;
 				System.out.println("Link connection established with: " + reg.getIp() + " on port: " + reg.getPort());
 				neighbors.add(socket);
+				break;
+			case 5:
+				LinkWeights lw = (LinkWeights) event;
+				System.out.println("Received link overlay");
+				graph = new ShortestPath(lw.getLinks());
 				break;
 		}
 	}
