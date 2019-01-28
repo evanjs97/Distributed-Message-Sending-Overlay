@@ -1,25 +1,54 @@
 package cs455.overlay.util;
 
-import java.util.LinkedList;
 
 public class OverlayNode {
 	private String ip;
 	private int port;
 	private int maxConnections;
 
-	private LinkedList<OverlayNode> connections;
-	private LinkedList<OverlayEdge> edges;
+	private OverlayNode[] connections;
+	private OverlayEdge[] edges;
+	private int size = 0;
 
+	/**
+	 * OverlayNode for setting up overlay
+	 * @param ip of this node
+	 * @param port this node listens over
+	 * @param maxConnections exact number of connections this node should have
+	 */
 	public OverlayNode(String ip, int port, int maxConnections) {
 		this.ip = ip;
 		this.port = port;
-		this.connections = new LinkedList<>();
+		this.connections = new OverlayNode[maxConnections];
+		this.edges = new OverlayEdge[maxConnections];
 		this.maxConnections = maxConnections;
 	}
 
-	public void addConnection(OverlayNode other) {
-		connections.add(other);
+	public OverlayNode(String ip, int port) {
+		this.ip = ip;
+		this.port = port;
 	}
+
+	/**
+	 * add edge indicating which other node this one has a connection to
+	 * @param other the node this node will be connected to
+	 * @param send whether this node has to initiate the connection, if true it initiates, if false other initiates
+	 */
+	public void addEdge(OverlayNode other, boolean send) {
+		if (size < edges.length){
+			edges[size] = new OverlayEdge(this, other, send);
+			size++;
+		}
+	}
+
+	public OverlayEdge getEdge(int index) {
+		return edges[index];
+	}
+
+	//	public void addConnection(OverlayNode other, boolean send) {
+//		connections.add(other);
+//		sendlist.add(send);
+//	}
 
 	public String getIp() {
 		return ip;
@@ -29,12 +58,12 @@ public class OverlayNode {
 		return this.port;
 	}
 
-	public void clear() {
-		connections.clear();
+	public OverlayEdge[] getEdges() {
+		return edges;
 	}
 
 	public int getCount() {
-		return connections.size();
+		return size;
 	}
 
 	public boolean isFull() {
@@ -42,10 +71,13 @@ public class OverlayNode {
 		else return false;
 	}
 
+	/**
+	 * @return string representation of this node, used for testing
+	 */
 	public String toString() {
 		String node = this.ip + ", " + this.port + ": ";
-		for(OverlayNode onode: connections) {
-			node += onode.getIp() + " ";
+		for(OverlayEdge edge: edges) {
+			node += edge.getEndpointTo().getIp() + " ";
 		}
 		return node;
 	}

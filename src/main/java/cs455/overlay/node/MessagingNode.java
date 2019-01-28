@@ -1,7 +1,10 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
+import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.util.OverlayNode;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.MessagingNodesList;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 
@@ -12,7 +15,8 @@ import java.util.Scanner;
 public class MessagingNode extends Node{
 
 
-
+	private Socket[] neighbors;
+	private int size = 0;
 	private String regName;
 	private int regPort;
 
@@ -70,6 +74,18 @@ public class MessagingNode extends Node{
 		socket.close();
 	}
 
+	private void neighborsOverlay(MessagingNodesList mnList) throws IOException{
+		neighbors = new Socket[mnList.getNumConnections()];
+		System.out.println("Num Neighbors: " + mnList.getNumConnections());
+		for(OverlayNode node : mnList.getNodes()) {
+			System.out.println("Neighbor Nodes: "+ node.getIp() + " " + node.getPort());
+			neighbors[size] = new Socket(node.getIp(),node.getPort());
+			System.out.println(this.address + " Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
+			new TCPSender(neighbors[size]).sendData(new Register(this.address,this.port, 4).getBytes());
+			size++;
+		}
+	}
+
 	/**
 	 * onEvent method accepts an event and handles it based on its type
 	 * @param event a message received event
@@ -77,10 +93,23 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	public void onEvent(Event event, Socket socket) throws IOException{
+		System.out.println("Message Node Event: " + event.getType());
 		switch(event.getType()) {
 			case 2:
 				RegisterResponse regRes = (RegisterResponse) event;
 				System.out.println("Response received from register: status: " + regRes.getStatus() + ", " + regRes.getInfo());
+				break;
+			case 3:
+				MessagingNodesList mnList = (MessagingNodesList) event;
+				System.out.println("Overlay setup command received");
+				neighborsOverlay(mnList);
+				break;
+			case 4:
+				Register reg = (Register) event;
+				System.out.println("Link connection established with: " + reg.getIp() + " on port: " + reg.getPort());
+				this.neighbors[size] = socket;
+				size++;
+				break;
 		}
 	}
 

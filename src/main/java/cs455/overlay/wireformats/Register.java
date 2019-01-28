@@ -11,10 +11,10 @@ public class Register extends MessageNodeEvent implements Event{
 	 *
 	 * @param ip
 	 * @param port
-	 * @param type type 0 = register, type 1 = deregister
+	 * @param type type 0 = register, type 1 = deregister, type 4 = message node link connection
 	 */
 	public Register(String ip, int port, int type) {
-		super(Math.min(1, type), ip, port);
+		super(type, ip, port);
 	}
 
 	public Register(DataInputStream din, int type) throws IOException{

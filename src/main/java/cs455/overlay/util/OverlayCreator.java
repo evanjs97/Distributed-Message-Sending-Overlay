@@ -33,15 +33,15 @@ public class OverlayCreator {
 		}
 	}
 
-	/**
-	 * clear the overlay specified
-	 * @param nodes the overlay to clear
-	 */
-	public static void clearOverlay(OverlayNode[] nodes) {
-		for(OverlayNode node : nodes) {
-			node.clear();
-		}
-	}
+//	/**
+//	 * clear the overlay specified
+//	 * @param nodes the overlay to clear
+//	 */
+//	public static void clearOverlay(OverlayNode[] nodes) {
+//		for(OverlayNode node : nodes) {
+//			node.clear();
+//		}
+//	}
 
 	/**
 	 * setup overlay so that there are no partitions
@@ -54,11 +54,11 @@ public class OverlayCreator {
 		System.out.println("Setting up overlay");
 		for(int i = 0; i < nodes.length; i++) {
 			if(i == nodes.length-1) {
-				nodes[i].addConnection(nodes[0]);
-				nodes[0].addConnection(nodes[i]);
+				nodes[i].addEdge(nodes[0],true);
+				nodes[0].addEdge(nodes[i],false);
 			}else {
-				nodes[i].addConnection(nodes[i + 1]);
-				nodes[i + 1].addConnection(nodes[i]);
+				nodes[i].addEdge(nodes[i + 1],true);
+				nodes[i + 1].addEdge(nodes[i],false);
 			}
 		}
 		int currCount;
@@ -68,8 +68,8 @@ public class OverlayCreator {
 			while(currCount < connectionCount) {
 				int temp = (i + index) % nodes.length;
 				if(!nodes[temp].isFull()) {
-					nodes[i].addConnection(nodes[temp]);
-					nodes[temp].addConnection(nodes[i]);
+					nodes[i].addEdge(nodes[temp],true);
+					nodes[temp].addEdge(nodes[i],false);
 					index++;
 					currCount++;
 				}

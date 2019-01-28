@@ -63,6 +63,12 @@ public class EventFactory {
 			case 2:
 				e = new RegisterResponse(din);
 				break;
+			case 3:
+				e = new MessagingNodesList(din);
+				break;
+			case 4:
+				e = new Register(din, type);
+				break;
 		}
 		baInputStream.close();
 		din.close();

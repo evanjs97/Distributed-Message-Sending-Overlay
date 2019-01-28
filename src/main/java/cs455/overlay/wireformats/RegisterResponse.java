@@ -28,9 +28,6 @@ public class RegisterResponse implements Event{
 		return type;
 	}
 
-	public void unMarshall(DataInputStream din) throws IOException{
-
-	}
 
 	/**
 	 * Marshall/encode the registration response message for transfer over TCP

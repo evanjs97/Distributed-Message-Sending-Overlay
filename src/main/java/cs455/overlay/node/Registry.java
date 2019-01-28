@@ -4,6 +4,7 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.OverlayNode;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.MessagingNodesList;
 import cs455.overlay.wireformats.Register;
 import cs455.overlay.wireformats.RegisterResponse;
 
@@ -80,7 +81,7 @@ public class Registry extends Node{
 		}
 	}
 
-	private void createOverlay(int connectionCount) {
+	private void createOverlay(int connectionCount) throws IOException{
 		Iterator nodeIter = registeredNodes.entrySet().iterator();
 		OverlayNode[] nodes = new OverlayNode[registeredNodes.size()];
 		int index = 0;
@@ -92,6 +93,13 @@ public class Registry extends Node{
 		OverlayCreator.createOverlay(nodes, connectionCount);
 		this.overlay = nodes;
 		OverlayCreator.printOverlay(this.overlay);
+		sendOverlay();
+	}
+
+	private void sendOverlay() throws IOException{
+		for(OverlayNode oNode : overlay) {
+			new TCPSender(new Socket(oNode.getIp(),oNode.getPort())).sendData(new MessagingNodesList(oNode.getEdges()).getBytes());
+		}
 	}
 
 
@@ -145,8 +153,6 @@ public class Registry extends Node{
 
 		}
 	}
-
-
 
 	/**
 	 * main method for Registry class error checks and creates Registry
