@@ -12,11 +12,11 @@ public class OverlayEdge {
 	 * @param to the node that the edge holder connects to
 	 * @param send if true 'from' node initiates connection, if false 'to' node will initiate
 	 */
-	public OverlayEdge(OverlayNode from, OverlayNode to, boolean send) {
+	public OverlayEdge(OverlayNode from, OverlayNode to, boolean send, int weight) {
 		this.endpointFrom = from;
 		this.endpointTo = to;
-		this.weight = (int) (10 * Math.random());
 		this.send = send;
+		this.weight = weight;
 	}
 
 	public OverlayNode getEndpointFrom() {

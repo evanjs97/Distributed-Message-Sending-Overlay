@@ -13,7 +13,6 @@ import java.util.Queue;
  */
 public class EventFactory {
 	private static EventFactory eventFactory;
-	private Queue<Event> eventQueue = new LinkedList<>();
 	/**
 	 * private constructor can only be called from this class
 	 */
@@ -26,15 +25,6 @@ public class EventFactory {
 	static {
 		eventFactory = new EventFactory();
 	}
-
-	public boolean hasEvent() {
-		return eventQueue.isEmpty();
-	}
-
-	public Event nextEvent() {
-		return eventQueue.poll();
-	}
-
 
 	public static EventFactory getInstance() {
 		return eventFactory;

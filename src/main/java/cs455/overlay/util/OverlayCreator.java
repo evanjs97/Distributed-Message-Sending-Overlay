@@ -1,15 +1,8 @@
 package cs455.overlay.util;
 
-public class OverlayCreator {
-	//private OverlayNode[] nodes;
+import java.util.LinkedList;
 
-//	/**
-//	 * sets this class with the specified overlay
-//	 * @param nodes the overlay to set
-//	 */
-//	private void set(OverlayNode[] nodes) {
-//		this.nodes = nodes;
-//	}
+public class OverlayCreator {
 
 	/**
 	 * starts the chain of processes that spawn a new overlay
@@ -33,15 +26,21 @@ public class OverlayCreator {
 		}
 	}
 
-//	/**
-//	 * clear the overlay specified
-//	 * @param nodes the overlay to clear
-//	 */
-//	public static void clearOverlay(OverlayNode[] nodes) {
-//		for(OverlayNode node : nodes) {
-//			node.clear();
-//		}
-//	}
+	public static LinkedList<OverlayEdge> getEdges(OverlayNode[] nodes) {
+		LinkedList<OverlayEdge> edgeWeights = new LinkedList<>();
+		for(OverlayNode node : nodes) {
+			for(OverlayEdge edge : node.getEdges()) {
+				if(edge.getSend()) {
+					edgeWeights.add(edge);
+				}
+			}
+		}
+		return edgeWeights;
+	}
+
+	public static int randomWeight() {
+		return (int) (10 * Math.random());
+	}
 
 	/**
 	 * setup overlay so that there are no partitions
@@ -51,14 +50,17 @@ public class OverlayCreator {
 	 * @param connectionCount the exact number of connections each node must have
 	 */
 	private static void setupOverlay(OverlayNode[] nodes, int connectionCount) {
+		int weight;
 		System.out.println("Setting up overlay");
 		for(int i = 0; i < nodes.length; i++) {
 			if(i == nodes.length-1) {
-				nodes[i].addEdge(nodes[0],true);
-				nodes[0].addEdge(nodes[i],false);
+				weight = randomWeight();
+				nodes[i].addEdge(nodes[0],true, weight);
+				nodes[0].addEdge(nodes[i],false, weight);
 			}else {
-				nodes[i].addEdge(nodes[i + 1],true);
-				nodes[i + 1].addEdge(nodes[i],false);
+				weight = randomWeight();
+				nodes[i].addEdge(nodes[i + 1],true, weight);
+				nodes[i + 1].addEdge(nodes[i],false, weight);
 			}
 		}
 		int currCount;
@@ -68,8 +70,9 @@ public class OverlayCreator {
 			while(currCount < connectionCount) {
 				int temp = (i + index) % nodes.length;
 				if(!nodes[temp].isFull()) {
-					nodes[i].addEdge(nodes[temp],true);
-					nodes[temp].addEdge(nodes[i],false);
+					weight = randomWeight();
+					nodes[i].addEdge(nodes[temp],true, weight);
+					nodes[temp].addEdge(nodes[i],false, weight);
 					index++;
 					currCount++;
 				}

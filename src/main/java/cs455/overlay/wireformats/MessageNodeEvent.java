@@ -30,7 +30,7 @@ public class MessageNodeEvent implements Event{
 	 */
 	@Override
 	public byte[] getBytes() throws IOException {
-		byte[] marshalledData = null;
+		byte[] marshalledData;
 		ByteArrayOutputStream baOutStream = new ByteArrayOutputStream();
 		DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(baOutStream));
 

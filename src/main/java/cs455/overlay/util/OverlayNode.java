@@ -34,9 +34,9 @@ public class OverlayNode {
 	 * @param other the node this node will be connected to
 	 * @param send whether this node has to initiate the connection, if true it initiates, if false other initiates
 	 */
-	public void addEdge(OverlayNode other, boolean send) {
+	public void addEdge(OverlayNode other, boolean send, int weight) {
 		if (size < edges.length){
-			edges[size] = new OverlayEdge(this, other, send);
+			edges[size] = new OverlayEdge(this, other, send, weight);
 			size++;
 		}
 	}
@@ -44,11 +44,6 @@ public class OverlayNode {
 	public OverlayEdge getEdge(int index) {
 		return edges[index];
 	}
-
-	//	public void addConnection(OverlayNode other, boolean send) {
-//		connections.add(other);
-//		sendlist.add(send);
-//	}
 
 	public String getIp() {
 		return ip;

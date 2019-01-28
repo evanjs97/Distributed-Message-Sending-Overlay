@@ -1,13 +1,11 @@
 package cs455.overlay.node;
 
-import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.EventFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class Node {

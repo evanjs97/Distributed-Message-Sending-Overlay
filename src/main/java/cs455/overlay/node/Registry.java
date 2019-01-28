@@ -2,6 +2,7 @@ package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.OverlayCreator;
+import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.MessagingNodesList;
@@ -81,6 +82,12 @@ public class Registry extends Node{
 		}
 	}
 
+	/**
+	 * createOverlay method sets up the overlay of connections to be made by registered nodes
+	 * through use of the OverlayCreator class
+	 * @param connectionCount is the max number of connections allowed
+	 * @throws IOException
+	 */
 	private void createOverlay(int connectionCount) throws IOException{
 		Iterator nodeIter = registeredNodes.entrySet().iterator();
 		OverlayNode[] nodes = new OverlayNode[registeredNodes.size()];
@@ -100,6 +107,10 @@ public class Registry extends Node{
 		for(OverlayNode oNode : overlay) {
 			new TCPSender(new Socket(oNode.getIp(),oNode.getPort())).sendData(new MessagingNodesList(oNode.getEdges()).getBytes());
 		}
+	}
+
+	private void sendLinkWeights(LinkedList<OverlayEdge> links) {
+
 	}
 
 
@@ -125,6 +136,9 @@ public class Registry extends Node{
 						//System.out.println("TEST: " + scan.next());
 						createOverlay(scan.nextInt());
 						scan.nextLine();
+						break;
+					case "send-overlay-link-weights":
+						sendLinkWeights(OverlayCreator.getEdges(overlay));
 						break;
 
 				}
