@@ -112,7 +112,7 @@ public class MessagingNode extends Node{
 			case 5:
 				LinkWeights lw = (LinkWeights) event;
 				System.out.println("Received link overlay");
-				graph = new ShortestPath(lw.getLinks());
+				graph = new ShortestPath(lw.getLinks(), this);
 				break;
 			case 6:
 				Message msg = (Message) event;

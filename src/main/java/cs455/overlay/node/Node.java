@@ -14,6 +14,8 @@ public abstract class Node {
 	protected InetAddress iAddress;
 	protected int port;
 
+	public String getAddress() { return this.address; }
+	public int getPort() { return this.port; }
 	/**
 	 * Node constructor to be inherited by MessagingNode and Registry
 	 * @param port is the port to open a TCPServerThread over, pass '0' for automatic allocation

@@ -3,7 +3,7 @@ package cs455.overlay.util;
 
 import java.util.ArrayList;
 
-public class OverlayNode {
+public class OverlayNode implements Comparable<OverlayNode>{
 	private String ip;
 	private int port;
 	private int maxConnections;
@@ -11,6 +11,9 @@ public class OverlayNode {
 	private ArrayList<OverlayNode> connections;
 	private ArrayList<OverlayEdge> edges;
 	private int size = 0;
+
+	private OverlayNode dijPrev;
+	private int distance;
 
 	/**
 	 * OverlayNode for setting up overlay
@@ -33,6 +36,16 @@ public class OverlayNode {
 		this.port = port;
 
 	}
+
+	public void makeDijkstra() {
+		this.dijPrev = null;
+		this.distance = 2147483647;
+	}
+
+	public int getDistance() { return this.distance; }
+	public OverlayNode getPrev() { return this.dijPrev; }
+	public void setDistance(int distance) { this.distance = distance; }
+	public void setPrev(OverlayNode prev) { this.dijPrev = prev; }
 
 	/**
 	 * add edge indicating which other node this one has a connection to
@@ -82,5 +95,12 @@ public class OverlayNode {
 			node += edge.getEndpointTo().getIp() + " ";
 		}
 		return node;
+	}
+
+	@Override
+	public int compareTo(OverlayNode o) {
+		if(this.distance < o.distance) return -1;
+		else if(this.distance > o.distance) return 1;
+		else return 0;
 	}
 }
