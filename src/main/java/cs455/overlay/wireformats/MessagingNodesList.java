@@ -1,10 +1,10 @@
 package cs455.overlay.wireformats;
 
-import cs455.overlay.node.MessagingNode;
 import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class MessagingNodesList implements Event{
@@ -17,7 +17,7 @@ public class MessagingNodesList implements Event{
 	 * out those nodes that should the calling node need not connect to
 	 * @param edges the edge list to be filtered
 	 */
-	public MessagingNodesList(OverlayEdge[] edges) {
+	public MessagingNodesList(ArrayList<OverlayEdge> edges) {
 		this.nodes = new LinkedList<>();
 		for(OverlayEdge edge : edges) {
 			if(edge.getSend()) this.nodes.add(edge.getEndpointTo());

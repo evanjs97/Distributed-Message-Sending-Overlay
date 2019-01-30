@@ -43,6 +43,7 @@ public class EventFactory {
 				new DataInputStream(new BufferedInputStream(baInputStream));
 		int type = din.readInt();
 		Event e = null;
+		System.out.println("Event received of type: " + type);
 		switch (type) {
 			case 0:
 				e = new Register(din, type);
@@ -61,6 +62,11 @@ public class EventFactory {
 				break;
 			case 5:
 				e = new LinkWeights(din);
+				break;
+			case 6:
+				e = new Message(din);
+				break;
+
 		}
 		baInputStream.close();
 		din.close();

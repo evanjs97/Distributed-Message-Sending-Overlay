@@ -9,11 +9,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public abstract class Node {
-	private TCPServerThread tcpServerThread;
+	//private TCPServerThread tcpServerThread;
 	protected String address;
 	protected InetAddress iAddress;
 	protected int port;
-	private EventFactory eventFactory;
 
 	/**
 	 * Node constructor to be inherited by MessagingNode and Registry
@@ -21,7 +20,7 @@ public abstract class Node {
 	 * @throws IOException if TCPServerThread fails to create ServerSocket
 	 */
 	public Node(int port) throws IOException{
-		tcpServerThread = new TCPServerThread(port,this);
+		TCPServerThread tcpServerThread = new TCPServerThread(port, this);
 		address = tcpServerThread.getAddress();
 		iAddress = tcpServerThread.getInetAddress();
 		System.out.println("Server Thread opened on: " + address + " INET: " + iAddress);

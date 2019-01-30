@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class MessagingNode extends Node{
 
 
-	private ConcurrentLinkedQueue<Socket> neighbors;
+	private ConcurrentLinkedQueue<TCPSender> neighbors = new ConcurrentLinkedQueue<>();
 	private String regName;
 	private int regPort;
 	private ShortestPath graph;
@@ -55,7 +55,7 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void register() throws IOException{
-		System.out.println("Registering...");
+		System.out.println("Registering... on host: " + regName + ":" + regPort);
 		Socket socket = new Socket(regName, regPort);
 		new TCPSender(socket).sendData(new Register(this.address, this.port, 0).getBytes());
 		socket.close();
@@ -78,9 +78,10 @@ public class MessagingNode extends Node{
 		for(OverlayNode node : mnList.getNodes()) {
 			System.out.println("Neighbor Nodes: "+ node.getIp() + " " + node.getPort());
 			Socket socket = new Socket(node.getIp(),node.getPort());
-			neighbors.add(socket);
+			TCPSender sender = new TCPSender(socket);
+			neighbors.add(sender);
 			System.out.println(this.address + " Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
-			new TCPSender(socket).sendData(new Register(this.address,this.port, 4).getBytes());
+			sender.sendData(new Register(this.address,this.port, 4).getBytes());
 		}
 		System.out.println("All connections are established. Number of connections: " + mnList.getNodes().size());
 	}
@@ -106,12 +107,16 @@ public class MessagingNode extends Node{
 			case 4:
 				Register reg = (Register) event;
 				System.out.println("Link connection established with: " + reg.getIp() + " on port: " + reg.getPort());
-				neighbors.add(socket);
+				neighbors.add(new TCPSender(new Socket(reg.getIp(),reg.getPort())));
 				break;
 			case 5:
 				LinkWeights lw = (LinkWeights) event;
 				System.out.println("Received link overlay");
 				graph = new ShortestPath(lw.getLinks());
+				break;
+			case 6:
+				Message msg = (Message) event;
+				System.out.println("Received Message: " + msg.getPayload());
 				break;
 		}
 	}
@@ -134,6 +139,10 @@ public class MessagingNode extends Node{
 					case "exit-overlay":
 						deregister();
 						break;
+					case "try-send":
+						for(TCPSender sender : neighbors) {
+							sender.sendData(new Message().getBytes());
+						}
 
 				}
 			}

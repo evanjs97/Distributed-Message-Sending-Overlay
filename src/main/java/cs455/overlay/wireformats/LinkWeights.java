@@ -15,6 +15,7 @@ public class LinkWeights implements Event{
 	}
 
 	public LinkWeights(DataInputStream din) throws IOException {
+		links = new LinkedList<>();
 		int numLinks = din.readInt();
 
 		byte[] linkInfo;

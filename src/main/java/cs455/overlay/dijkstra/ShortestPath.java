@@ -3,14 +3,17 @@ package cs455.overlay.dijkstra;
 import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.SortedSet;
 
 public class ShortestPath {
 	private RoutingCache cache;
 	Set<OverlayNode> nodes;
 
 	public ShortestPath(LinkedList<OverlayEdge> edges) {
+		this.nodes = new HashSet<>();
 		for(OverlayEdge edge : edges) {
 			OverlayNode node1 = edge.getEndpointFrom();
 			OverlayNode node2 = edge.getEndpointTo();

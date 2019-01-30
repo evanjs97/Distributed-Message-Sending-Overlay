@@ -1,6 +1,7 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
+import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
@@ -185,6 +186,7 @@ public class Registry extends Node{
 			}
 			System.out.println("Creating Registry!");
 			Registry registry = new Registry(port);
+			//new TCPServerThread(port,registry);
 			registry.commandHandler();
 
 		}catch (NumberFormatException e) {

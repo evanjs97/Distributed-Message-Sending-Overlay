@@ -27,6 +27,8 @@ public class OverlayNode {
 	}
 
 	public OverlayNode(String ip, int port) {
+		this.connections = new ArrayList<>();
+		this.edges = new ArrayList<>();
 		this.ip = ip;
 		this.port = port;
 
@@ -38,10 +40,8 @@ public class OverlayNode {
 	 * @param send whether this node has to initiate the connection, if true it initiates, if false other initiates
 	 */
 	public void addEdge(OverlayNode other, boolean send, int weight) {
-		if (size < edges.size()){
-			edges.add(new OverlayEdge(this, other, send, weight));
-			size++;
-		}
+		edges.add(new OverlayEdge(this, other, send, weight));
+		size++;
 	}
 
 	public void addEdge(OverlayEdge edge) {

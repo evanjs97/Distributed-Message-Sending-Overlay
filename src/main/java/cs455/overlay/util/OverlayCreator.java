@@ -14,6 +14,7 @@ public class OverlayCreator {
 			System.out.println(nodes.length + " " + connectionCount);
 		}else {
 			setupOverlay(nodes, connectionCount);
+			printOverlay(nodes);
 		}
 	}
 
@@ -21,6 +22,7 @@ public class OverlayCreator {
 	 * prints out the overlay of this class
 	 */
 	public static void printOverlay(OverlayNode[] nodes) {
+		System.out.println("Printing overlay");
 		for(OverlayNode node : nodes) {
 			System.out.println(node);
 		}
