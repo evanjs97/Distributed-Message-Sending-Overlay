@@ -103,4 +103,20 @@ public class OverlayNode implements Comparable<OverlayNode>{
 		else if(this.distance > o.distance) return 1;
 		else return 0;
 	}
+
+	@Override
+	public int hashCode() {
+		return (this.getIp() + ":" + this.getPort()).hashCode();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if(!(o instanceof OverlayNode)) return false;
+		else {
+			OverlayNode node = (OverlayNode) o;
+			String nodeAddress = node.getIp() + ":" + node.getPort();;
+			String thisAddress = this.ip + ":" + this.port;
+			return nodeAddress.equals(thisAddress);
+		}
+	}
 }

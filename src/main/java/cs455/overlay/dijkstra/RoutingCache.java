@@ -12,9 +12,9 @@ public class RoutingCache {
 	public RoutingCache(Set<OverlayNode> nodes, OverlayNode start) {
 		cache = new HashMap<>();
 		for(OverlayNode node : nodes) {
-			if(node != start) {
+			if(!node.equals(start)) {
 				LinkedList<OverlayNode> path = new LinkedList<>();
-				OverlayNode prev = node.getPrev();
+				OverlayNode prev = node;
 				while(prev != null) {
 					path.addFirst(prev);
 					prev = prev.getPrev();
@@ -25,15 +25,26 @@ public class RoutingCache {
 		}
 	}
 
-	public LinkedList<OverlayNode> getPath(OverlayNode dest) {
-		String key = dest.getIp() + ":" + dest.getPort();
-		return cache.get(key);
+	public void print() {
+		Iterator cacheIter = cache.entrySet().iterator();
+		while(cacheIter.hasNext()) {
+			Map.Entry tuple = (Map.Entry) cacheIter.next();
+			System.out.println(tuple.getKey() + ":  " + tuple.getValue());
+		}
 	}
 
-	public OverlayNode getRandom() {
+	public LinkedList<OverlayNode> getRandomPath() {
 		Random rand = new Random();
 		Object[] entries = cache.entrySet().toArray();
-		return (OverlayNode) entries[rand.nextInt(entries.length)];
-
+		Map.Entry tuple = (Map.Entry) entries[rand.nextInt(entries.length)];
+		return cache.get(tuple.getKey());
+		//return cache.get(key);
 	}
+
+//	public String getRandom() {
+//		Random rand = new Random();
+//		Object[] entries = cache.entrySet().toArray();
+//		Map.Entry tuple = (Map.Entry) entries[rand.nextInt(entries.length)];
+//		return tuple.getKey();
+//	}
 }

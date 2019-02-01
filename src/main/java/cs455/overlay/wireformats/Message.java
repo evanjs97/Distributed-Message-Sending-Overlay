@@ -44,6 +44,10 @@ public class Message implements Event{
 		return !routingPlan.isEmpty();
 	}
 
+	public OverlayNode nextDest() {
+		return routingPlan.pollFirst();
+	}
+
 	@Override
 	public byte[] getBytes() throws IOException {
 		byte[] marshalledData;

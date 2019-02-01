@@ -21,49 +21,59 @@ public class ShortestPath {
 			nodes.add(node2);
 			for(OverlayNode node : nodes) {
 				if(node.getIp().equals(start.getAddress()) && node.getPort() == start.getPort()) this.start = node;
-				if(node.getIp().equals(node1.getIp())) node.addEdge(edge);
-				else if(node.getIp().equals(node2.getIp())) {
+				if(node.equals(node1)) node.addEdge(edge);
+				else if(node.equals(node2)) {
 					node.addEdge(new OverlayEdge(node2,node1,true,edge.getWeight()));
 				}
 			}
 		}
 		dijkstra();
+		System.out.println("Start: " + this.start);
+		System.out.println("Printing nodes in set:");
 		for(OverlayNode node : nodes) {
 			System.out.println(node);
 		}
 		System.out.println("Link weights are received and processed. Ready to send messages.");
 	}
 
-	public LinkedList<OverlayNode> getShortestPath(OverlayNode dest) {
-		return cache.getPath(dest);
+	public LinkedList<OverlayNode> getRandomShortestPath() {
+		return cache.getRandomPath();
 	}
 
 	private void dijkstra() {
-		SortedSet<OverlayNode> set = new TreeSet<>();
+		SortedSet<OverlayNode> set = new HashSet<>();
 		for(OverlayNode node : nodes) {
 			node.makeDijkstra();
-			if(node.getIp().equals(start.getIp()) && node.getPort() == start.getPort()) node.setDistance(0);
+			if(node.equals(start)) node.setDistance(0);
 			set.add(node);
 		}
 
 		while(!set.isEmpty()) {
+			OverlayNode node = null;
+			for(OverlayNode nodeTest : set) {
+				if(node <)
+			}
 			OverlayNode node = set.first();
 			set.remove(node);
 
 			for(OverlayEdge edge : node.getEdges()) {
-				int dist = node.getDistance() + edge.getWeight();
+				OverlayNode edgeNode = edge.getEndpointTo();
+				if(set.contains(edgeNode)) {
+					int dist = node.getDistance() + edge.getWeight();
 
-				if(dist < edge.getEndpointTo().getDistance()) {
-					edge.getEndpointTo().setDistance(dist);
-					edge.getEndpointTo().setPrev(node);
+					if (dist < edgeNode.getDistance()) {
+						edgeNode.setDistance(dist);
+						edgeNode.setPrev(node);
+					}
 				}
 			}
 		}
 		cache = new RoutingCache(nodes,start);
+		cache.print();
 	}
 
-	public OverlayNode randomSink() {
-		return cache.getRandom();
-	}
+//	public OverlayNode randomSink() {
+//		return cache.getRandom();
+//	}
 
 }

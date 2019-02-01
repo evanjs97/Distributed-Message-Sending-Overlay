@@ -90,11 +90,18 @@ public class MessagingNode extends Node{
 
 	private void startRounds(int rounds) throws IOException{
 		for(int i = 0; i < rounds; i++) {
-			LinkedList<OverlayNode> path = graph.getShortestPath(graph.randomSink());
+			LinkedList<OverlayNode> path = graph.getRandomShortestPath();
+			System.out.println("ShortestPath: \n" + path);
 			OverlayNode dest = path.pollFirst();
 			TCPSender sender = neighbors.get(dest.getIp()+ ":" + dest.getPort());
 			sender.sendData(new Message(path).getBytes());
 		}
+	}
+
+	private void relayMessage(Message msg) throws IOException{
+		OverlayNode dest = msg.nextDest();
+		TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
+		sender.sendData(msg.getBytes());
 	}
 
 	/**
