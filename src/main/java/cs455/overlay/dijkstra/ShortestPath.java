@@ -41,24 +41,28 @@ public class ShortestPath {
 	}
 
 	private void dijkstra() {
-		SortedSet<OverlayNode> set = new HashSet<>();
+		ArrayList<OverlayNode> set = new ArrayList<>();
 		for(OverlayNode node : nodes) {
 			node.makeDijkstra();
 			if(node.equals(start)) node.setDistance(0);
+			//System.out.println("NODE:  " + node);
 			set.add(node);
 		}
 
 		while(!set.isEmpty()) {
-			OverlayNode node = null;
+			OverlayNode node = set.get(0);
 			for(OverlayNode nodeTest : set) {
-				if(node <)
+				if(nodeTest.compareTo(node) < 0) node = nodeTest;
 			}
-			OverlayNode node = set.first();
 			set.remove(node);
 
 			for(OverlayEdge edge : node.getEdges()) {
 				OverlayNode edgeNode = edge.getEndpointTo();
-				if(set.contains(edgeNode)) {
+				boolean isInSet = false;
+				for(OverlayNode nodeTest : set) {
+					if(edgeNode.equals(nodeTest)) isInSet = true;
+				}
+				if(isInSet) {
 					int dist = node.getDistance() + edge.getWeight();
 
 					if (dist < edgeNode.getDistance()) {

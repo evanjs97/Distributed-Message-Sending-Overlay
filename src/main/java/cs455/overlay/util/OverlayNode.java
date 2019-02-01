@@ -111,10 +111,12 @@ public class OverlayNode implements Comparable<OverlayNode>{
 
 	@Override
 	public boolean equals(Object o) {
-		if(!(o instanceof OverlayNode)) return false;
+		if(!(o instanceof OverlayNode)) {
+			return false;
+		}
 		else {
 			OverlayNode node = (OverlayNode) o;
-			String nodeAddress = node.getIp() + ":" + node.getPort();;
+			String nodeAddress = node.getIp() + ":" + node.getPort();
 			String thisAddress = this.ip + ":" + this.port;
 			return nodeAddress.equals(thisAddress);
 		}

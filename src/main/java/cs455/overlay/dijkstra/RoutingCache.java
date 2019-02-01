@@ -15,7 +15,7 @@ public class RoutingCache {
 			if(!node.equals(start)) {
 				LinkedList<OverlayNode> path = new LinkedList<>();
 				OverlayNode prev = node;
-				while(prev != null) {
+				while(prev != null && !prev.equals(start)) {
 					path.addFirst(prev);
 					prev = prev.getPrev();
 				}
