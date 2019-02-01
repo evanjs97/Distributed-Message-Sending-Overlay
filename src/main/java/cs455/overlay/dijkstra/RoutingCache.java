@@ -1,10 +1,9 @@
 package cs455.overlay.dijkstra;
 
+import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class RoutingCache {
 
@@ -29,5 +28,12 @@ public class RoutingCache {
 	public LinkedList<OverlayNode> getPath(OverlayNode dest) {
 		String key = dest.getIp() + ":" + dest.getPort();
 		return cache.get(key);
+	}
+
+	public OverlayNode getRandom() {
+		Random rand = new Random();
+		Object[] entries = cache.entrySet().toArray();
+		return (OverlayNode) entries[rand.nextInt(entries.length)];
+
 	}
 }

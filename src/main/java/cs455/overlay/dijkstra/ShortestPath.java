@@ -62,4 +62,8 @@ public class ShortestPath {
 		cache = new RoutingCache(nodes,start);
 	}
 
+	public OverlayNode randomSink() {
+		return cache.getRandom();
+	}
+
 }

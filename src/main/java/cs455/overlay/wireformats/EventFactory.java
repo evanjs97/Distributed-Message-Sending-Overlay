@@ -66,6 +66,9 @@ public class EventFactory {
 			case 6:
 				e = new Message(din);
 				break;
+			case 7:
+				e = new TaskInitiate(din);
+				break;
 
 		}
 		baInputStream.close();

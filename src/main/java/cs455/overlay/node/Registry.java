@@ -116,6 +116,13 @@ public class Registry extends Node{
 		System.out.println("Sent all link weights.");
 	}
 
+	private void startRounds(int rounds) throws IOException{
+		for(OverlayNode oNode : overlay) {
+			new TCPSender(new Socket(oNode.getIp(), oNode.getPort())).sendData(new TaskInitiate(rounds).getBytes());
+		}
+		System.out.println("Starting Rounds.");
+	}
+
 
 	/**
 	 * handles commands for the registry
@@ -143,7 +150,9 @@ public class Registry extends Node{
 					case "send-overlay-link-weights":
 						sendLinkWeights(OverlayCreator.getEdges(overlay));
 						break;
-
+					case "start":
+						startRounds(scan.nextInt());
+						break;
 				}
 			}
 		}

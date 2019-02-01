@@ -33,8 +33,8 @@ public class TCPReceiverThread implements Runnable {
 	@Override
 	public void run() {
 		int dataLength;
-		while(true) {
-			//while (socket != null) {
+		//while(true) {
+			while (socket != null) {
 				try {
 					dataLength = din.readInt();
 
@@ -42,13 +42,12 @@ public class TCPReceiverThread implements Runnable {
 					din.readFully(data, 0, dataLength);
 
 					Event event = EventFactory.getInstance().getEvent(data);
-					node.onEvent(event, socket);
+				node.onEvent(event, socket);
 					//break;
 				} catch (IOException ioe) {
 					//				System.out.println(ioe.getMessage() + " " + ioe.getLocalizedMessage());
 					//				break;
 				}
-			//}
-		}
+			}
 	}
 }

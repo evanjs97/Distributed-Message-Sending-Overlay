@@ -7,13 +7,15 @@ import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MessagingNode extends Node{
 
-
-	private ConcurrentLinkedQueue<TCPSender> neighbors = new ConcurrentLinkedQueue<>();
+	private ConcurrentHashMap<String, TCPSender> neighbors = new ConcurrentHashMap<>();
+	//private CopyOnWriteArrayList<TCPSender> neighbors = new CopyOnWriteArrayList<>();
 	private String regName;
 	private int regPort;
 	private ShortestPath graph;
@@ -73,17 +75,26 @@ public class MessagingNode extends Node{
 	}
 
 	private void neighborsOverlay(MessagingNodesList mnList) throws IOException{
-		neighbors = new ConcurrentLinkedQueue<>();
+		neighbors = new ConcurrentHashMap<>();
 		System.out.println("Num Neighbors: " + mnList.getNumConnections());
 		for(OverlayNode node : mnList.getNodes()) {
 			System.out.println("Neighbor Nodes: "+ node.getIp() + " " + node.getPort());
 			Socket socket = new Socket(node.getIp(),node.getPort());
 			TCPSender sender = new TCPSender(socket);
-			neighbors.add(sender);
+			neighbors.put(node.getIp() + ":"+node.getPort(),sender);
 			System.out.println(this.address + " Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
 			sender.sendData(new Register(this.address,this.port, 4).getBytes());
 		}
 		System.out.println("All connections are established. Number of connections: " + mnList.getNodes().size());
+	}
+
+	private void startRounds(int rounds) throws IOException{
+		for(int i = 0; i < rounds; i++) {
+			LinkedList<OverlayNode> path = graph.getShortestPath(graph.randomSink());
+			OverlayNode dest = path.pollFirst();
+			TCPSender sender = neighbors.get(dest.getIp()+ ":" + dest.getPort());
+			sender.sendData(new Message(path).getBytes());
+		}
 	}
 
 	/**
@@ -107,7 +118,7 @@ public class MessagingNode extends Node{
 			case 4:
 				Register reg = (Register) event;
 				System.out.println("Link connection established with: " + reg.getIp() + " on port: " + reg.getPort());
-				neighbors.add(new TCPSender(new Socket(reg.getIp(),reg.getPort())));
+				neighbors.put(reg.getIp() + ":" + reg.getPort(), new TCPSender(new Socket(reg.getIp(),reg.getPort())));
 				break;
 			case 5:
 				LinkWeights lw = (LinkWeights) event;
@@ -116,7 +127,15 @@ public class MessagingNode extends Node{
 				break;
 			case 6:
 				Message msg = (Message) event;
-				System.out.println("Received Message: " + msg.getPayload());
+				if(msg.relay())  {
+					System.out.println("Relaying Message: " + msg.getPayload());
+
+				} else System.out.println("Received Message: " + msg.getPayload());
+				break;
+			case 7:
+				TaskInitiate task = (TaskInitiate) event;
+				System.out.println("Starting rounds: " + task.getRounds());
+				startRounds(task.getRounds());
 				break;
 		}
 	}
@@ -139,10 +158,10 @@ public class MessagingNode extends Node{
 					case "exit-overlay":
 						deregister();
 						break;
-					case "try-send":
-						for(TCPSender sender : neighbors) {
-							sender.sendData(new Message().getBytes());
-						}
+//					case "try-send":
+//						for(TCPSender sender : neighbors) {
+//							sender.sendData(new Message().getBytes());
+//						}
 
 				}
 			}
