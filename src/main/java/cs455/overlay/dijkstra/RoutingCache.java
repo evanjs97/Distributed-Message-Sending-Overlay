@@ -15,7 +15,7 @@ public class RoutingCache {
 			if(!node.equals(start)) {
 				LinkedList<OverlayNode> path = new LinkedList<>();
 				OverlayNode prev = node;
-				while(prev != null && !prev.equals(start)) {
+				while(!prev.equals(start)) {
 					path.addFirst(prev);
 					prev = prev.getPrev();
 				}
@@ -27,17 +27,20 @@ public class RoutingCache {
 
 	public void print() {
 		Iterator cacheIter = cache.entrySet().iterator();
+		System.out.println("\n\n");
 		while(cacheIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) cacheIter.next();
 			System.out.println(tuple.getKey() + ":  " + tuple.getValue());
-		}
+		}System.out.println("\n\n");
+
 	}
 
 	public LinkedList<OverlayNode> getRandomPath() {
 		Random rand = new Random();
 		Object[] entries = cache.entrySet().toArray();
 		Map.Entry tuple = (Map.Entry) entries[rand.nextInt(entries.length)];
-		return cache.get(tuple.getKey());
+		LinkedList<OverlayNode> copy = new LinkedList<>((LinkedList<OverlayNode>) tuple.getValue());
+		return copy;
 		//return cache.get(key);
 	}
 

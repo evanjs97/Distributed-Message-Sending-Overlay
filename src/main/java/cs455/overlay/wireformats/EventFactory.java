@@ -43,7 +43,6 @@ public class EventFactory {
 				new DataInputStream(new BufferedInputStream(baInputStream));
 		int type = din.readInt();
 		Event e = null;
-		System.out.println("Event received of type: " + type);
 		switch (type) {
 			case 0:
 				e = new Register(din, type);

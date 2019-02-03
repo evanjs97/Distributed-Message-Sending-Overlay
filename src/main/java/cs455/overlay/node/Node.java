@@ -11,6 +11,7 @@ import java.net.Socket;
 public abstract class Node {
 	//private TCPServerThread tcpServerThread;
 	protected String address;
+	protected String hostname;
 	protected InetAddress iAddress;
 	protected int port;
 

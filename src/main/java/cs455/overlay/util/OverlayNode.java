@@ -90,10 +90,10 @@ public class OverlayNode implements Comparable<OverlayNode>{
 	 * @return string representation of this node, used for testing
 	 */
 	public String toString() {
-		String node = this.ip + ", " + this.port + ": ";
-		for(OverlayEdge edge: edges) {
-			node += edge.getEndpointTo().getIp() + " ";
-		}
+		String node = this.ip + ", " + this.port + " Distance: " + this.distance + " Prev: " + dijPrev;
+//		for(OverlayEdge edge: edges) {
+//			node += edge.getEndpointTo().getIp() + " --";
+//		}
 		return node;
 	}
 

@@ -20,13 +20,15 @@ public class Message implements Event{
 		routingPlan = new LinkedList<>();
 
 		byte[] path;
-		for(int i = 0; i < din.readInt(); i++) {
+		int num = din.readInt();
+		for(int i = 0; i < num; i++) {
 			int length = din.readInt();
 			path = new byte[length];
 
 			din.readFully(path);
 			String[] split = new String(path).split(":");
 			routingPlan.addFirst(new OverlayNode(split[0], Integer.parseInt(split[1])));
+
 		}
 		this.payload = din.readInt();
 	}
