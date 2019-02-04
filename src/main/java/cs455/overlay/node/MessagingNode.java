@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MessagingNode extends Node{
 
@@ -62,7 +61,7 @@ public class MessagingNode extends Node{
 	private void register() throws IOException{
 		System.out.println("Registering... on host: " + regName + ":" + regPort);
 		Socket socket = new Socket(regName, regPort);
-		new TCPSender(socket).sendData(new Register(this.address, this.port, 0).getBytes());
+		new TCPSender(socket).sendData(new Register(this.address, this.port).getBytes());
 		socket.close();
 	}
 
@@ -73,7 +72,7 @@ public class MessagingNode extends Node{
 	private void deregister() throws IOException{
 		System.out.println("De-registering...");
 		Socket socket = new Socket(regName, regPort);
-		new TCPSender(socket).sendData(new Register(this.address,this.port, 1).getBytes());
+		new TCPSender(socket).sendData(new Deregister(this.address,this.port).getBytes());
 		socket.close();
 	}
 
@@ -87,7 +86,7 @@ public class MessagingNode extends Node{
 			neighbors.put(node.getIp() + ":"+node.getPort(),sender);
 			new Thread(new TCPReceiverThread(socket,this)).start();
 			System.out.println(this.address + " Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
-			sender.sendData(new Register(this.address,this.port, 4).getBytes());
+			sender.sendData(new CreateLink(this.address,this.port).getBytes());
 		}
 		System.out.println("All connections are established. Number of connections: " + mnList.getNodes().size());
 	}
@@ -104,6 +103,7 @@ public class MessagingNode extends Node{
 			TCPSender sender = neighbors.get(dest.getIp()+ ":" + dest.getPort());
 			sender.sendData(new Message(path).getBytes());
 		}
+		new TCPSender(new Socket(regName,regPort)).sendData(new TaskComplete(address,port).getBytes());
 	}
 
 	private void relayMessage(Message msg) throws IOException{
@@ -130,9 +130,9 @@ public class MessagingNode extends Node{
 				neighborsOverlay(mnList);
 				break;
 			case 4:
-				Register reg = (Register) event;
-				System.out.println("Link connection established with: " + reg.getIp() + " on port: " + reg.getPort());
-				neighbors.put(reg.getIp() + ":" + reg.getPort(), new TCPSender(socket));
+				CreateLink link = (CreateLink) event;
+				System.out.println("Link connection established with: " + link.getIp() + " on port: " + link.getPort());
+				neighbors.put(link.getIp() + ":" + link.getPort(), new TCPSender(socket));
 				break;
 			case 5:
 				LinkWeights lw = (LinkWeights) event;

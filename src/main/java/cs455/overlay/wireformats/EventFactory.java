@@ -45,10 +45,10 @@ public class EventFactory {
 		Event e = null;
 		switch (type) {
 			case 0:
-				e = new Register(din, type);
+				e = new Register(din);
 				break;
 			case 1:
-				e = new Register(din, type);
+				e = new Deregister(din);
 				break;
 			case 2:
 				e = new RegisterResponse(din);
@@ -57,7 +57,7 @@ public class EventFactory {
 				e = new MessagingNodesList(din);
 				break;
 			case 4:
-				e = new Register(din, type);
+				e = new CreateLink(din);
 				break;
 			case 5:
 				e = new LinkWeights(din);
@@ -67,6 +67,9 @@ public class EventFactory {
 				break;
 			case 7:
 				e = new TaskInitiate(din);
+				break;
+			case 8:
+				e = new TaskComplete(din);
 				break;
 
 		}

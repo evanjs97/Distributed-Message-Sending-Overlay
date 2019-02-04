@@ -57,7 +57,7 @@ public class Registry extends Node{
 	 * @param socket the socket the dreg request was received over
 	 * @throws IOException
 	 */
-	private void deregisterNode(Register dreg, Socket socket) throws IOException {
+	private void deregisterNode(Deregister dreg, Socket socket) throws IOException {
 		System.out.println("Deregister request received from: " + dreg.getIp() +" on port: " + dreg.getPort());
 		Integer port = registeredNodes.get(dreg.getIp());
 		if(port == null || !dreg.getIp().equals(socket.getInetAddress().getHostAddress())) {
@@ -172,9 +172,14 @@ public class Registry extends Node{
 				registerNode(reg, socket);
 				break;
 			case 1:
-				Register dreg = (Register) event;
+				Deregister dreg = (Deregister) event;
 				deregisterNode(dreg, socket);
 				break;
+			case 8:
+				TaskComplete task = (TaskComplete) event;
+
+				break;
+
 
 
 		}
