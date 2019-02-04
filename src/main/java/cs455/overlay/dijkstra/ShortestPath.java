@@ -11,6 +11,11 @@ public class ShortestPath {
 	Set<OverlayNode> nodes;
 	private OverlayNode start;
 
+	/**
+	 * ShortestPath constructor, reconstructs overlay from edge list and finds shortest path to all other nodes
+	 * @param edges the edge list to construct nodes list from
+	 * @param start the node to start shortest path from
+	 */
 	public ShortestPath(LinkedList<OverlayEdge> edges, MessagingNode start) {
 		this.nodes = new HashSet<>();
 
@@ -22,8 +27,6 @@ public class ShortestPath {
 			for(OverlayNode node : nodes) {
 				if(node.equals(node1)) node1 =  node;
 				if(node.equals(node2)) node2 = node;
-//				if(node.equals(node1))node.addEdge(new OverlayEdge(node,node2,true,edge.getWeight()));
-//				if(node.equals(node2))node.addEdge(new OverlayEdge(node,node1,true, edge.getWeight()));
 				if(node.getIp().equals(start.getAddress()) && node.getPort() == start.getPort()) this.start = node;
 			}
 			node1.addEdge(new OverlayEdge(node1,node2,true,edge.getWeight()));
@@ -32,11 +35,6 @@ public class ShortestPath {
 
 		}
 		dijkstra();
-		System.out.println("Start: " + this.start);
-		System.out.println("Printing nodes in set:");
-		for(OverlayNode node : nodes) {
-			System.out.println(node);
-		}
 		System.out.println("Link weights are received and processed. Ready to send messages.");
 	}
 
@@ -44,68 +42,54 @@ public class ShortestPath {
 		return cache.getRandomPath();
 	}
 
+	/**
+	 * dijkstra finds the shortest path from start to each other node in the graph
+	 */
 	private void dijkstra() {
 		ArrayList<OverlayNode> set = new ArrayList<>();
-		//System.out.println("START NODES");
 		for(OverlayNode node : nodes) {
 			node.makeDijkstra();
 			if(node.equals(start)) {
 				node.setDistance(0);
 			}
-			//System.out.println("NODE:  " + node);
 			set.add(node);
 		}
-		//System.out.println("FINISHED START NODES");
-//		for(OverlayNode node : nodes) {
-//			System.out.println(node);
-//			for(OverlayEdge edge : node.getEdges()) {
-//				System.out.println("EDGE:");
-//				System.out.println(edge.getEndpointFrom());
-//				System.out.println(edge.getEndpointTo());
-//			}
-//		}
 
 		while(!set.isEmpty()) {
+			/**
+			 * find min distance node from set then remove it
+			 */
 			OverlayNode node = set.get(0);
 			for(OverlayNode nodeTest : set) {
 				if(nodeTest.compareTo(node) < 0) node = nodeTest;
 			}
 			set.remove(node);
 
-//			System.out.println("Djikstra set");
-//			for(OverlayNode test : set) {
-//				System.out.println(test);
-//			}
-//			System.out.println("Djikstra nodes");
-//			for(OverlayNode test2 : nodes) {
-//				System.out.println(test2);
-//			}
-
+			/**
+			 * look at each of min node's edges, check if dest node is not in set and distance is
+			 * less than current distance of dest node, update its distance to new shorter one
+			 */
 			for(OverlayEdge edge : node.getEdges()) {
 				OverlayNode edgeNode = edge.getEndpointTo();
-				if(edgeNode.equals(node)) edgeNode = edge.getEndpointFrom();
-				System.out.println(edgeNode);
-				boolean isInSet = false;
-				for(OverlayNode nodeTest : set) {
-					if(edgeNode.equals(nodeTest)) isInSet = true;
-				}
-				if(isInSet) {
+//				if(edgeNode.equals(node)) edgeNode = edge.getEndpointFrom();
+//				boolean isInSet = false;
+//				for(OverlayNode nodeTest : set) {
+//					if(edgeNode.equals(nodeTest)) isInSet = true;
+//				}
+//				set.contains(node)
+				if(set.contains(edgeNode)) {
 					int dist = node.getDistance() + edge.getWeight();
-					System.out.println("DISTANCE: " + dist + " " + edgeNode.getDistance());
 					if (dist < edgeNode.getDistance()) {
-						System.out.println("New Distance");
 						edgeNode.setDistance(dist);
 						edgeNode.setPrev(node);
 					}
 				}
 			}
 		}
+		//nodes.remove(start);
 		cache = new RoutingCache(nodes,start);
 		cache.print();
 	}
 
-//	public OverlayNode randomSink() {
-//		return cache.getRandom();
-//	}
 
 }

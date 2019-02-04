@@ -76,6 +76,11 @@ public class MessagingNode extends Node{
 		socket.close();
 	}
 
+	/**
+	 * neighborsOverlay establishes connections to all nodes the register tells it to
+	 * @param mnList the list of nodes to connect to
+	 * @throws IOException
+	 */
 	private void neighborsOverlay(MessagingNodesList mnList) throws IOException{
 		neighbors = new ConcurrentHashMap<>();
 		System.out.println("Num Neighbors: " + mnList.getNumConnections());
@@ -91,6 +96,11 @@ public class MessagingNode extends Node{
 		System.out.println("All connections are established. Number of connections: " + mnList.getNodes().size());
 	}
 
+	/**
+	 * startRounds starts sending messages to other nodes in the overlay based off of dijkstra's shortest path
+	 * @param rounds the number of messages to send
+	 * @throws IOException
+	 */
 	private void startRounds(int rounds) throws IOException{
 		Iterator nodeIter = neighbors.entrySet().iterator();
 		while(nodeIter.hasNext()) {
@@ -106,6 +116,11 @@ public class MessagingNode extends Node{
 		new TCPSender(new Socket(regName,regPort)).sendData(new TaskComplete(address,port).getBytes());
 	}
 
+	/**
+	 * relays message from sender node to node specified in message
+	 * @param msg the message that specifies the path for the message
+	 * @throws IOException
+	 */
 	private void relayMessage(Message msg) throws IOException{
 		OverlayNode dest = msg.nextDest();
 		TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());

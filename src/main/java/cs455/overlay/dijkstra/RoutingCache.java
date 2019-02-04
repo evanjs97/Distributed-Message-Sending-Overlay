@@ -9,6 +9,11 @@ public class RoutingCache {
 
 	private HashMap<String, LinkedList<OverlayNode>> cache;
 
+	/**
+	 * RoutingCache constructor caches shortest paths found by dijkstra
+	 * @param nodes the list of nodes to cache paths to
+	 * @param start the node in the list not to find path to
+	 */
 	public RoutingCache(Set<OverlayNode> nodes, OverlayNode start) {
 		cache = new HashMap<>();
 		for(OverlayNode node : nodes) {
@@ -25,6 +30,9 @@ public class RoutingCache {
 		}
 	}
 
+	/**
+	 * print out all paths in the cache
+	 */
 	public void print() {
 		Iterator cacheIter = cache.entrySet().iterator();
 		System.out.println("\n\n");
@@ -35,6 +43,10 @@ public class RoutingCache {
 
 	}
 
+	/**
+	 * find random path from the cache
+	 * @return the random path gotten from the cache
+	 */
 	public LinkedList<OverlayNode> getRandomPath() {
 		Random rand = new Random();
 		Object[] entries = cache.entrySet().toArray();
@@ -44,10 +56,4 @@ public class RoutingCache {
 		//return cache.get(key);
 	}
 
-//	public String getRandom() {
-//		Random rand = new Random();
-//		Object[] entries = cache.entrySet().toArray();
-//		Map.Entry tuple = (Map.Entry) entries[rand.nextInt(entries.length)];
-//		return tuple.getKey();
-//	}
 }

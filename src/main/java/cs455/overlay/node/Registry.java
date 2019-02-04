@@ -102,12 +102,21 @@ public class Registry extends Node{
 		sendOverlay();
 	}
 
+	/**
+	 * sendOverlay will send a list of nodes each node should connect to, each node will have same # of connections
+	 * @throws IOException
+	 */
 	private void sendOverlay() throws IOException{
 		for(OverlayNode oNode : overlay) {
 			new TCPSender(new Socket(oNode.getIp(),oNode.getPort())).sendData(new MessagingNodesList(oNode.getEdges()).getBytes());
 		}
 	}
 
+	/**
+	 * sendLinkWeights will send each registered node the linkWeights of each connection in the overlay
+	 * @param links the link edges to send (don't send same edge twice)
+	 * @throws IOException
+	 */
 	private void sendLinkWeights(LinkedList<OverlayEdge> links) throws IOException{
 		Iterator nodeIter = registeredNodes.entrySet().iterator();
 		while(nodeIter.hasNext()) {
@@ -117,6 +126,11 @@ public class Registry extends Node{
 		System.out.println("Sent all link weights.");
 	}
 
+	/**
+	 * startRounds method will send message to each node indicating they should start sending messages to other nodes
+	 * @param rounds the number of rounds of messages to send
+	 * @throws IOException
+	 */
 	private void startRounds(int rounds) throws IOException{
 		for(OverlayNode oNode : overlay) {
 			new TCPSender(new Socket(oNode.getIp(), oNode.getPort())).sendData(new TaskInitiate(rounds).getBytes());
@@ -159,10 +173,16 @@ public class Registry extends Node{
 		}
 	}
 
+	/**
+	 * taskComplete increments task complete counter if sender node is registered
+	 * then sends PullTrafficSummary request if counter is equal to registered.size()
+	 * @param task is the task complete message with info about which node sent it
+	 * @throws IOException
+	 */
 	private void taskComplete(TaskComplete task) throws IOException{
 		if(registeredNodes.containsKey(task.getIp()+":"+task.getPort())) {
 			int current = completedNodes.addAndGet(1);
-			if(current == registeredNodes.size()) {
+			if(current >= registeredNodes.size()) {
 				Iterator nodeIter = registeredNodes.entrySet().iterator();
 				while(nodeIter.hasNext()) {
 					Map.Entry tuple = (Map.Entry) nodeIter.next();
