@@ -71,6 +71,9 @@ public class EventFactory {
 			case 8:
 				e = new TaskComplete(din);
 				break;
+			case 9:
+				e = new PullTrafficSummary();
+				break;
 
 		}
 		baInputStream.close();

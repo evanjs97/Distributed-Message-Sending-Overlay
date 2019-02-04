@@ -1,7 +1,6 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPSender;
-import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
@@ -10,11 +9,13 @@ import cs455.overlay.wireformats.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Registry extends Node{
 
 	private Map<String, Integer> registeredNodes;
+	private final AtomicInteger completedNodes = new AtomicInteger();
 	private OverlayNode[] overlay;
 	/**
 	 * Registry constructor creates new Registry on current machine listening over specified port
@@ -158,6 +159,19 @@ public class Registry extends Node{
 		}
 	}
 
+	private void taskComplete(TaskComplete task) throws IOException{
+		if(registeredNodes.containsKey(task.getIp()+":"+task.getPort())) {
+			int current = completedNodes.addAndGet(1);
+			if(current == registeredNodes.size()) {
+				Iterator nodeIter = registeredNodes.entrySet().iterator();
+				while(nodeIter.hasNext()) {
+					Map.Entry tuple = (Map.Entry) nodeIter.next();
+					new TCPSender(new Socket(tuple.getKey().toString(), (Integer) tuple.getValue())).sendData(new PullTrafficSummary().getBytes());
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * onEvent method accepts an event and handles it based on its type
@@ -176,8 +190,7 @@ public class Registry extends Node{
 				deregisterNode(dreg, socket);
 				break;
 			case 8:
-				TaskComplete task = (TaskComplete) event;
-
+				taskComplete((TaskComplete) event);
 				break;
 
 

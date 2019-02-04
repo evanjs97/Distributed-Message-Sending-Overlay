@@ -172,11 +172,6 @@ public class MessagingNode extends Node{
 					case "exit-overlay":
 						deregister();
 						break;
-//					case "try-send":
-//						for(TCPSender sender : neighbors) {
-//							sender.sendData(new Message().getBytes());
-//						}
-
 				}
 			}
 		}
