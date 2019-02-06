@@ -1,7 +1,7 @@
 package cs455.overlay.dijkstra;
 
-import cs455.overlay.util.OverlayEdge;
 import cs455.overlay.util.OverlayNode;
+import cs455.overlay.wireformats.LinkWeights;
 
 import java.util.*;
 
@@ -38,7 +38,11 @@ public class RoutingCache {
 		System.out.println("\n\n");
 		while(cacheIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) cacheIter.next();
-			System.out.println(tuple.getKey() + ":  " + tuple.getValue());
+			System.out.print(tuple.getKey() + ":  " + tuple.getValue());
+			LinkedList<OverlayNode> temp = (LinkedList<OverlayNode>) tuple.getValue();
+			for(OverlayNode node : temp) {
+
+			}
 		}System.out.println("\n\n");
 
 	}
@@ -53,7 +57,6 @@ public class RoutingCache {
 		Map.Entry tuple = (Map.Entry) entries[rand.nextInt(entries.length)];
 		LinkedList<OverlayNode> copy = new LinkedList<>((LinkedList<OverlayNode>) tuple.getValue());
 		return copy;
-		//return cache.get(key);
 	}
 
 }

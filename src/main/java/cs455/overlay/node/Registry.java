@@ -9,10 +9,14 @@ import cs455.overlay.wireformats.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Registry extends Node{
+
+	private ConcurrentLinkedQueue<TrafficSummary> summary;
+
 
 	private Map<String, Integer> registeredNodes;
 	private final AtomicInteger completedNodes = new AtomicInteger();
@@ -24,6 +28,7 @@ public class Registry extends Node{
 	 */
 	public Registry(int port) throws IOException {
 		super(port);
+		summary = new ConcurrentLinkedQueue<>();
 		registeredNodes = Collections.synchronizedMap(new HashMap<String, Integer>());
 	}
 
@@ -192,6 +197,30 @@ public class Registry extends Node{
 		}
 	}
 
+	private void printSummary() {
+		System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+		System.out.println("|  Number  |  Number of  |   Summation of sent   | Summation of received | Number of |");
+		System.out.println("|    of    |  messages   |       messages        |       messages        | messages  |");
+		System.out.println("| messages |  received   |                       |                       | relayed   |");
+		System.out.println("|   sent   |                                                                         |");
+		System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+		int current = 1;
+		int sendTrack = 0;
+		int receiveTrack = 0;
+		int relaytrack = 0;
+		long sendSum = 0;
+		long receiveSum = 0;
+		for(TrafficSummary sum : summary) {
+			sendTrack += sum.getSendTracker(); receiveTrack += sum.getReceiveTracker(); relaytrack += sum.getRelayTracker();
+			sendSum += sum.getSendSummation(); receiveSum += sum.getReceiveSummation();
+			System.out.printf("| Node %d  | %d | %d | %d | %d | %d |",current, sum.getSendTracker(),
+					sum.getReceiveTracker(),sum.getSendSummation(), sum.getReceiveSummation(), sum.getRelayTracker());
+			System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+		}
+		System.out.printf("|   Sum   | %d | %d | %d | %d | %d |", sendTrack,receiveTrack, sendSum, receiveSum, relaytrack);
+		System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+	}
+
 
 	/**
 	 * onEvent method accepts an event and handles it based on its type
@@ -212,7 +241,11 @@ public class Registry extends Node{
 			case 8:
 				taskComplete((TaskComplete) event);
 				break;
-
+			case 10:
+				TrafficSummary traffic = (TrafficSummary) event;
+				summary.add(traffic);
+				if(summary.size() == registeredNodes.size()) printSummary();
+				break;
 
 
 		}

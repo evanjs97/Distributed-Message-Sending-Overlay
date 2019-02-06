@@ -4,6 +4,7 @@ import cs455.overlay.dijkstra.ShortestPath;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.util.OverlayNode;
+import cs455.overlay.util.StatisticsCollectorAndDisplay;
 import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class MessagingNode extends Node{
 	private String regName;
 	private int regPort;
 	private ShortestPath graph;
+	private StatisticsCollectorAndDisplay statistics;
 
 
 	/**
@@ -33,6 +35,7 @@ public class MessagingNode extends Node{
 
 		this.regName = regName;
 		this.regPort = regPort;
+		statistics = new StatisticsCollectorAndDisplay(address, port);
 
 		register();
 
@@ -111,7 +114,9 @@ public class MessagingNode extends Node{
 			LinkedList<OverlayNode> path = graph.getRandomShortestPath();
 			OverlayNode dest = path.pollFirst();
 			TCPSender sender = neighbors.get(dest.getIp()+ ":" + dest.getPort());
-			sender.sendData(new Message(path).getBytes());
+			Message msg = new Message(path);
+			sender.sendData(msg.getBytes());
+			statistics.sendMessage(msg.getPayload());
 		}
 		new TCPSender(new Socket(regName,regPort)).sendData(new TaskComplete(address,port).getBytes());
 	}
@@ -125,6 +130,7 @@ public class MessagingNode extends Node{
 		OverlayNode dest = msg.nextDest();
 		TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
 		sender.sendData(msg.getBytes());
+		statistics.relayMessage();
 	}
 
 	/**
@@ -159,13 +165,18 @@ public class MessagingNode extends Node{
 				if(msg.relay())  {
 					System.out.println("Relaying Message: " + msg.getPayload());
 					relayMessage(msg);
-				} else System.out.println("Received Message: " + msg.getPayload());
+				} else {
+					statistics.receivedMessage(msg.getPayload());
+					System.out.println("Received Message: " + msg.getPayload());
+				}
 				break;
 			case 7:
 				TaskInitiate task = (TaskInitiate) event;
 				System.out.println("Starting rounds: " + task.getRounds());
 				startRounds(task.getRounds());
 				break;
+			case 9:
+				new TCPSender(new Socket(regName,regPort)).sendData(statistics.getTrafficSummary().getBytes());
 		}
 	}
 
