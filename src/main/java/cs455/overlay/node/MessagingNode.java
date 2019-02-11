@@ -105,19 +105,21 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void startRounds(int rounds) throws IOException{
-		Iterator nodeIter = neighbors.entrySet().iterator();
-		while(nodeIter.hasNext()) {
-			Map.Entry tuple = (Map.Entry) nodeIter.next();
-		}
 
 		for(int i = 0; i < rounds; i++) {
 			LinkedList<OverlayNode> path = graph.getRandomShortestPath();
+			for(OverlayNode node : path) System.out.print(node.getIp() + ":" + node.getPort() + "->");
+			System.out.println();
 			OverlayNode dest = path.pollFirst();
-			TCPSender sender = neighbors.get(dest.getIp()+ ":" + dest.getPort());
-			Message msg = new Message(path);
-			sender.sendData(msg.getBytes());
-			statistics.sendMessage(msg.getPayload());
+			synchronized (neighbors) {
+				TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
+				Message msg = new Message(path);
+				sender.sendData(msg.getBytes());
+				statistics.sendMessage(msg.getPayload());
+			}
+
 		}
+		System.out.println("FINISHED ROUNDS");
 		new TCPSender(new Socket(regName,regPort)).sendData(new TaskComplete(address,port).getBytes());
 	}
 
@@ -127,9 +129,13 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void relayMessage(Message msg) throws IOException{
+		System.out.println(msg);
 		OverlayNode dest = msg.nextDest();
-		TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
-		sender.sendData(msg.getBytes());
+		System.out.println(dest.getIp() + ":" + dest.getPort());
+		synchronized (neighbors) {
+			TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
+			sender.sendData(msg.getBytes());
+		}
 		statistics.relayMessage();
 	}
 
@@ -177,6 +183,8 @@ public class MessagingNode extends Node{
 				break;
 			case 9:
 				new TCPSender(new Socket(regName,regPort)).sendData(statistics.getTrafficSummary().getBytes());
+				statistics = new StatisticsCollectorAndDisplay(address,port);
+				break;
 		}
 	}
 

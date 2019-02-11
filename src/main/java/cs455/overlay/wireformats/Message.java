@@ -27,7 +27,7 @@ public class Message implements Event{
 
 			din.readFully(path);
 			String[] split = new String(path).split(":");
-			routingPlan.addFirst(new OverlayNode(split[0], Integer.parseInt(split[1])));
+			routingPlan.addLast(new OverlayNode(split[0], Integer.parseInt(split[1])));
 
 		}
 		this.payload = din.readInt();
@@ -48,6 +48,15 @@ public class Message implements Event{
 
 	public OverlayNode nextDest() {
 		return routingPlan.pollFirst();
+	}
+
+	@Override
+	public String toString() {
+		String s = "";
+		for(OverlayNode node: routingPlan) {
+			s += node.getIp() + ":" + node.getPort() + "--->";
+		}
+		return s;
 	}
 
 	@Override

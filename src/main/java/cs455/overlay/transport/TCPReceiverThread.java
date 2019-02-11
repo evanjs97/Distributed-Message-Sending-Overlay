@@ -32,7 +32,7 @@ public class TCPReceiverThread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		int dataLength;
+		int dataLength = 0;
 		//while(true) {
 			while (socket != null) {
 				try {
@@ -48,6 +48,9 @@ public class TCPReceiverThread implements Runnable {
 					//System.out.println(ioe);
 					//				System.out.println(ioe.getMessage() + " " + ioe.getLocalizedMessage());
 					//				break;
+				} catch(NegativeArraySizeException ne) {
+					System.out.println("INVALID SIZE: " + dataLength);
+					System.out.println(ne);
 				}
 			}
 		//}

@@ -69,6 +69,7 @@ public class EventFactory {
 				e = new TaskInitiate(din);
 				break;
 			case 8:
+				System.out.println("Parsing Task Complete");
 				e = new TaskComplete(din);
 				break;
 			case 9:
@@ -81,6 +82,9 @@ public class EventFactory {
 		}
 		baInputStream.close();
 		din.close();
+		if(e == null) {
+			System.out.println("NULL EVENT OF TYPE: " + type);
+		}
 		return e;
 	}
 

@@ -38,11 +38,13 @@ public class RoutingCache {
 		System.out.println("\n\n");
 		while(cacheIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) cacheIter.next();
-			System.out.print(tuple.getKey() + ":  " + tuple.getValue());
 			LinkedList<OverlayNode> temp = (LinkedList<OverlayNode>) tuple.getValue();
+			System.out.print(tuple.getKey() + "===");
 			for(OverlayNode node : temp) {
-
+				System.out.print(node + "--->");
 			}
+			System.out.println("\n");
+
 		}System.out.println("\n\n");
 
 	}

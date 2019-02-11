@@ -22,12 +22,12 @@ public class StatisticsCollectorAndDisplay {
 	}
 
 	public void receivedMessage(int received) {
-		receiveTracker.addAndGet(1);
+		receiveTracker.incrementAndGet();
 		receiveSummation.addAndGet(received);
 	}
 
 	public void sendMessage(int sent) {
-		sendTracker.addAndGet(1);
+		sendTracker.incrementAndGet();
 		sendSummation.addAndGet(sent);
 	}
 

@@ -78,7 +78,7 @@ public class OverlayNode implements Comparable<OverlayNode>{
 	}
 
 	public int getCount() {
-		return size;
+		return edges.size();
 	}
 
 	public boolean isFull() {
