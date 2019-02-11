@@ -11,7 +11,6 @@ public class OverlayCreator {
 	 */
 	public static void createOverlay(OverlayNode[] nodes, int connectionCount) {
 		if(nodes.length <= connectionCount || (nodes.length * connectionCount) % 2 != 0 || (connectionCount == 1 && nodes.length > 2)) {
-			System.out.println(nodes.length + " " + connectionCount);
 		}else {
 			setupOverlay(nodes, connectionCount);
 			printOverlay(nodes);
@@ -53,9 +52,7 @@ public class OverlayCreator {
 	 */
 	private static void setupOverlay(OverlayNode[] nodes, int connectionCount) {
 		int weight;
-		System.out.println("Setting up overlay");
 		for(int i = 0; i < nodes.length; i++) {
-			System.out.println(i);
 			if(i == nodes.length-1) {
 
 				weight = randomWeight();
@@ -67,12 +64,10 @@ public class OverlayCreator {
 				nodes[i + 1].addEdge(nodes[i],false, weight);
 			}
 		}
-		System.out.println("INITIAL SETUP OF OVERLAY DONE");
 		int currCount;
 		int index = 2;
 		for(int i = 0; i < nodes.length; i++) {
 			currCount = nodes[i].getCount();
-			//System.out.println(i + " " + currCount);
 			while(currCount < connectionCount) {
 				int temp = (i + index) % nodes.length;
 				if(!nodes[temp].isFull()) {

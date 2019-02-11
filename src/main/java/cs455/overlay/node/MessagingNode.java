@@ -129,9 +129,9 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void relayMessage(Message msg) throws IOException{
-		System.out.println(msg);
+		//System.out.println(msg);
 		OverlayNode dest = msg.nextDest();
-		System.out.println(dest.getIp() + ":" + dest.getPort());
+		//System.out.println(dest.getIp() + ":" + dest.getPort());
 		synchronized (neighbors) {
 			TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
 			sender.sendData(msg.getBytes());
@@ -169,11 +169,11 @@ public class MessagingNode extends Node{
 			case 6:
 				Message msg = (Message) event;
 				if(msg.relay())  {
-					System.out.println("Relaying Message: " + msg.getPayload());
+					//System.out.println("Relaying Message: " + msg.getPayload());
 					relayMessage(msg);
 				} else {
 					statistics.receivedMessage(msg.getPayload());
-					System.out.println("Received Message: " + msg.getPayload());
+					//System.out.println("Received Message: " + msg.getPayload());
 				}
 				break;
 			case 7:

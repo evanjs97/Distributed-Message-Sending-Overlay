@@ -185,7 +185,7 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	private void taskComplete(TaskComplete task) throws IOException, InterruptedException{
-		synchronized (registeredNodes) {
+//		synchronized (registeredNodes) {
 			if (registeredNodes.contains(task.getIp() + ":" + task.getPort())) {
 				int current = completedNodes.addAndGet(1);
 				System.out.println("TASKCOMPLETE: " + current);
@@ -199,7 +199,7 @@ public class Registry extends Node{
 					}
 				}
 			}
-		}
+//		}
 	}
 
 	private static String padToSize(String s, int size) {
