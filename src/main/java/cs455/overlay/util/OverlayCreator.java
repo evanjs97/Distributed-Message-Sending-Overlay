@@ -11,8 +11,11 @@ public class OverlayCreator {
 	 */
 	public static void createOverlay(OverlayNode[] nodes, int connectionCount) {
 		if(nodes.length <= connectionCount || (nodes.length * connectionCount) % 2 != 0 || (connectionCount == 1 && nodes.length > 2)) {
+			System.out.println("OVERLAY CREATION FAILED: length: " + nodes.length + " connectionCount: " + connectionCount);
 		}else {
+			System.out.println("SETTING UP OVERLAY");
 			setupOverlay(nodes, connectionCount);
+
 			printOverlay(nodes);
 		}
 	}
@@ -64,6 +67,7 @@ public class OverlayCreator {
 				nodes[i + 1].addEdge(nodes[i],false, weight);
 			}
 		}
+
 		int currCount;
 		int index = 2;
 		for(int i = 0; i < nodes.length; i++) {
@@ -74,9 +78,9 @@ public class OverlayCreator {
 					weight = randomWeight();
 					nodes[i].addEdge(nodes[temp],true, weight);
 					nodes[temp].addEdge(nodes[i],false, weight);
-					index++;
 					currCount++;
 				}
+				index++;
 			}
 			index = 2;
 		}

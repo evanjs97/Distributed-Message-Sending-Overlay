@@ -97,7 +97,9 @@ public class Registry extends Node{
 			nodes[index] = new OverlayNode(arr[0],Integer.parseInt(arr[1]), connectionCount);
 			index++;
 		}
+
 		OverlayCreator.createOverlay(nodes, connectionCount);
+
 		this.overlay = nodes;
 		OverlayCreator.printOverlay(this.overlay);
 		sendOverlay();
