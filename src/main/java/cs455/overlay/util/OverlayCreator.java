@@ -13,10 +13,7 @@ public class OverlayCreator {
 		if(nodes.length <= connectionCount || (nodes.length * connectionCount) % 2 != 0 || (connectionCount == 1 && nodes.length > 2)) {
 			System.out.println("OVERLAY CREATION FAILED: length: " + nodes.length + " connectionCount: " + connectionCount);
 		}else {
-			System.out.println("SETTING UP OVERLAY");
 			setupOverlay(nodes, connectionCount);
-
-			printOverlay(nodes);
 		}
 	}
 

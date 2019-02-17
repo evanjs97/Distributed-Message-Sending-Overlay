@@ -101,7 +101,7 @@ public class Registry extends Node{
 		OverlayCreator.createOverlay(nodes, connectionCount);
 
 		this.overlay = nodes;
-		OverlayCreator.printOverlay(this.overlay);
+		//OverlayCreator.printOverlay(this.overlay);
 		sendOverlay();
 	}
 
@@ -121,6 +121,7 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	private void sendLinkWeights(LinkedList<OverlayEdge> links) throws IOException{
+
 		//Iterator nodeIter = registeredNodes.entrySet().iterator();
 		for(String address : registeredNodes) {
 			//Map.Entry tuple = (Map.Entry) nodeIter.next();
@@ -157,7 +158,6 @@ public class Registry extends Node{
 		while(true) {
 			while(scan.hasNext()) {
 				String command = scan.next();
-				System.out.println("Command: " + command);
 				switch(command) {
 
 					case "quit":
@@ -170,7 +170,9 @@ public class Registry extends Node{
 						createOverlay(scan.nextInt());
 						break;
 					case "send-overlay-link-weights":
-						sendLinkWeights(OverlayCreator.getEdges(overlay));
+						if(overlay == null) {
+							System.err.println("Error: please setup overlay before sending links");
+						}else sendLinkWeights(OverlayCreator.getEdges(overlay));
 						break;
 					case "start":
 						startRounds(scan.nextInt());

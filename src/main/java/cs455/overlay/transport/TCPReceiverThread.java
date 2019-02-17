@@ -33,26 +33,21 @@ public class TCPReceiverThread implements Runnable {
 	@Override
 	public void run() {
 		int dataLength = 0;
-		//while(true) {
-			while (socket != null) {
-				try {
-					dataLength = din.readInt();
+		while (socket != null) {
+			try {
+				dataLength = din.readInt();
 
-					byte[] data = new byte[dataLength];
-					din.readFully(data, 0, dataLength);
+				byte[] data = new byte[dataLength];
+				din.readFully(data, 0, dataLength);
 
-					Event event = EventFactory.getInstance().getEvent(data);
-					node.onEvent(event, socket);
-					//break;
-				} catch (IOException ioe) {
-					//System.out.println(ioe);
-					//				System.out.println(ioe.getMessage() + " " + ioe.getLocalizedMessage());
-					//				break;
-				} catch(NegativeArraySizeException ne) {
-					System.out.println("INVALID SIZE: " + dataLength);
-					System.out.println(ne);
-				}
+				Event event = EventFactory.getInstance().getEvent(data);
+				node.onEvent(event, socket);
+				//break;
+			} catch (IOException ioe) {
+			} catch(NegativeArraySizeException ne) {
+				System.out.println("INVALID SIZE: " + dataLength);
+				System.out.println(ne);
 			}
-		//}
+		}
 	}
 }
