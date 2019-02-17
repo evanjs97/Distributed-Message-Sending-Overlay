@@ -271,7 +271,6 @@ public class Registry extends Node{
 
 				synchronized (summary) {
 					summary.add(traffic);
-					System.out.println("Summary size is " + summary.size() + " nodes size is " + registeredNodes.size());
 					if (summary.size() == registeredNodes.size()) printSummary();
 				}
 				break;
