@@ -3,6 +3,7 @@
 ### Purpose: Building network overlay with multi..*node communication using dijkstra's shortest path to route packets
 
 #### Instructions, Compilation/Running:
+  
   *Compile on command line: "gradle build"
   *Startup registry:
     *navigate to "cs455.overlay/build/classes/java/main"
@@ -15,18 +16,18 @@
 	*Presumably you should first setup overlay on registry
 
 #### Commands:
-	..* Registry Commands:
-		* list..*messaging..*nodes: lists all registered messaging nodes.
-		* setup..*overlay {numLinks}: setup overlay of nodes with {numLinks} connections each
-			where {numLinks} %2 == 0 AND 1 < {numLinks} < # of registered nodes
-		* send..*overlay..*link..*weights: send randomly generated link weights to overlay nodes for use in shortest path.
-		* start {numRounds}: starts {numRounds} rounds where each messaging node sends 5 messages per round to random other messaging
+* Registry Commands:
+	* list-messaging-nodes: lists all registered messaging nodes.
+	* setup-overlay {numLinks}: setup overlay of nodes with {numLinks} connections each
+		where {numLinks} %2 == 0 AND 1 < {numLinks} < # of registered nodes
+	* send-overlay-link-weights: send randomly generated link weights to overlay nodes for use in shortest path.
+	* start {numRounds}: starts {numRounds} rounds where each messaging node sends 5 messages per round to random other messaging
 			node using shortest path calculations.
-		* quit: stops execution of messaging node program.
-	..* Messaging Node Commands:
-		* exit..*overlay: de..*registers node with registry.
-		* print..*shortest..*path: prints shortest path to each other node.
-		* quit: stops execution of messaging node program.
+	* quit: stops execution of messaging node program.
+* Messaging Node Commands:
+	* exit-overlay: de-registers node with registry.
+	* print-shortest-path: prints shortest path to each other node.
+	* quit: stops execution of messaging node program.
 
 #### Notes:
 	..* Registry will wait 15 seconds after receiving last task complete message before requesting statistics.
