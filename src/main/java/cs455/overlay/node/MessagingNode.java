@@ -101,18 +101,20 @@ public class MessagingNode extends Node{
 	 */
 	private void startRounds(int rounds) throws IOException{
 
-		for(int i = 0; i < rounds * 5; i++) {
+		for(int i = 0; i < rounds; i++) {
 			LinkedList<OverlayNode> path = graph.getRandomShortestPath();
-			try {
-				OverlayNode dest = path.pollFirst();
-				TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
-				Message msg = new Message(path);
-				sender.sendData(msg.getBytes());
-				statistics.sendMessage(msg.getPayload());
-			}catch(NullPointerException e) {
-				for(OverlayNode node : path) System.out.print(node.getIp() + ":" + node.getPort() + "->");
-				i--;
-			}
+			OverlayNode dest = path.pollFirst();
+			TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
+//			if(sender != null) {
+				for (int j = 0; j < 5; j++) {
+					Message msg = new Message(path);
+					//synchronized (sender) {
+						sender.sendData(msg.getBytes());
+					//}
+					statistics.sendMessage(msg.getPayload());
+				}
+//			}else i--;
+
 
 		}
 		System.out.println("FINISHED ROUNDS");
@@ -145,7 +147,6 @@ public class MessagingNode extends Node{
 				break;
 			case 3:
 				MessagingNodesList mnList = (MessagingNodesList) event;
-				neighbors = new HashMap<>();
 				System.out.println("Neighbor overlay received from registry. Establishing connections...");
 				neighborsOverlay(mnList);
 				break;
@@ -191,7 +192,7 @@ public class MessagingNode extends Node{
 	public void commandHandler() throws IOException{
 		Scanner scan = new Scanner(System.in);
 		while(true) {
-			while(scan.hasNext()) {
+			while(scan.hasNextLine()) {
 				String command = scan.nextLine();
 				switch(command) {
 					case "quit":

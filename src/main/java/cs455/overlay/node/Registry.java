@@ -44,14 +44,16 @@ public class Registry extends Node{
 
 
 		byte status = 0;
-		String info = "Successfully Registered!";
+		int numRegistered = registeredNodes.size()+1;
+		String info = "Successfully Registered! There are " + numRegistered + " currently registered.";
+
 		if(registeredNodes.contains(reg.getIp()+":"+reg.getPort())) {
 			status = 1;
 			info = "Registration failed, already registered";
 		}else {
 			registeredNodes.add(reg.getIp() + ":" + reg.getPort());
 		}
-		System.out.println("Registration request successful from node on: " + reg.getIp() + ":" + reg.getPort() +". The number of messaging nodes currently constituting the overlay is " + registeredNodes.size());
+		System.out.println("Registration request successful from node on: " + reg.getIp() + ":" + reg.getPort() +". The number of messaging nodes currently constituting the overlay is " + numRegistered);
 		Socket sender = new Socket(reg.getIp(),reg.getPort());
 		new TCPSender(sender).sendData(new RegisterResponse(status, info).getBytes());
 	}
@@ -122,7 +124,6 @@ public class Registry extends Node{
 	 */
 	private void sendLinkWeights(LinkedList<OverlayEdge> links) throws IOException{
 
-		//Iterator nodeIter = registeredNodes.entrySet().iterator();
 		for(String address : registeredNodes) {
 			//Map.Entry tuple = (Map.Entry) nodeIter.next();
 			String[] arr = address.split(":");
@@ -156,27 +157,51 @@ public class Registry extends Node{
 	public void commandHandler() throws IOException{
 		Scanner scan = new Scanner(System.in);
 		while(true) {
-			while(scan.hasNext()) {
-				String command = scan.next();
-				switch(command) {
+			while(scan.hasNextLine()) {
+				String command = scan.nextLine();
+				String[] split = command.split(" ");
+				try {
+					switch (split[0]) {
 
-					case "quit":
-						System.exit(0);
-					case "list-messaging-nodes":
-						listNodes();
-						break;
-					case "setup-overlay":
-						//System.out.println("TEST: " + scan.next());
-						createOverlay(scan.nextInt());
-						break;
-					case "send-overlay-link-weights":
-						if(overlay == null) {
-							System.err.println("Error: please setup overlay before sending links");
-						}else sendLinkWeights(OverlayCreator.getEdges(overlay));
-						break;
-					case "start":
-						startRounds(scan.nextInt());
-						break;
+						case "quit":
+							System.exit(0);
+						case "list-messaging-nodes":
+							listNodes();
+							break;
+						case "setup-overlay":
+							int def = 4;
+							if (def >= registeredNodes.size()) def = registeredNodes.size() - 1;
+							try {
+								if (split.length > 1) {
+									def = Integer.parseInt(split[1]);
+								} else {
+									System.out.println("Defaulting to " + def + " connections");
+								}
+								createOverlay(def);
+							} catch (Exception e) {
+								System.err.println("Error: argument after setup-overlay must be an int");
+							}
+							break;
+						case "send-overlay-link-weights":
+							if (overlay == null) {
+								System.err.println("Error: please setup overlay before sending links");
+							} else sendLinkWeights(OverlayCreator.getEdges(overlay));
+							break;
+						case "start":
+							if (split.length > 1) {
+								try {
+									startRounds(Integer.parseInt(split[1]));
+								} catch (Exception e) {
+									System.err.println("Error: Invalid argument to start. Should be integer");
+								}
+							} else {
+								System.err.println("Error: Please specify an int number of rounds as argument");
+							}
+							break;
+
+					}
+				}catch(InputMismatchException e) {
+
 				}
 			}
 		}

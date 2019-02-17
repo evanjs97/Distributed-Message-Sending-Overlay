@@ -4,13 +4,9 @@
 
 #### Instructions, Compilation/Running:
 * Compile on command line: "gradle build"
-* Startup registry:
-	* navigate to "cs455.overlay/build/classes/java/main"
-	* from that directory: "java cs455.overlay.node.Registry {portnum}"
-* Startup however many messaging nodes you would like, more than 1.
-	* navigate to "cs455.overlay/build/classes/java/main" on any machine
-	* from that directory: "java cs455.overlay.node.MessagingNode {registryName/IP} {registryPortNum}"
-	* node will automatically register with registry if found on that name/ip and port
+* run startup.sh script
+* startup.sh will default to starting registry on santa-fe on port 3007, but you can modify this if you like.
+* Registry will open in a large window and all the messaging nodes will open as tabs in smaller window.
 * Start running registry and/or messaging node commands.
 	* Presumably you should first setup overlay on registry
 

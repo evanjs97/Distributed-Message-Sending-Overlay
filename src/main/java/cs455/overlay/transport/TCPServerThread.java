@@ -56,7 +56,6 @@ public class TCPServerThread implements Runnable{
 		while (true) {
 			try {
 				Socket socket = serverSocket.accept();
-				System.out.println("Accepted Message");
 				new Thread(new TCPReceiverThread(socket, node)).start();
 			} catch (IOException ioe) {
 				System.out.println(ioe.getMessage());
