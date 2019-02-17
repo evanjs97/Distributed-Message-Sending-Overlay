@@ -7,15 +7,16 @@ import java.util.*;
 
 public class RoutingCache {
 
-	private HashMap<String, LinkedList<OverlayNode>> cache;
+	private final HashMap<String, LinkedList<OverlayNode>> cache;
+	private final HashMap<String, Integer> weights;
 
 	/**
 	 * RoutingCache constructor caches shortest paths found by dijkstra
 	 * @param nodes the list of nodes to cache paths to
 	 * @param start the node in the list not to find path to
 	 */
-	public RoutingCache(Set<OverlayNode> nodes, OverlayNode start) {
-		cache = new HashMap<>();
+	public RoutingCache(Set<OverlayNode> nodes, OverlayNode start, HashMap<String, Integer> weights) {
+		HashMap<String, LinkedList<OverlayNode>> cache = new HashMap<>();
 		for(OverlayNode node : nodes) {
 			if(!node.equals(start)) {
 				LinkedList<OverlayNode> path = new LinkedList<>();
@@ -28,25 +29,33 @@ public class RoutingCache {
 				cache.put(key,path);
 			}
 		}
+		this.cache = cache;
+		this.weights = weights;
 	}
 
 	/**
 	 * print out all paths in the cache
 	 */
-	public void print() {
+	public String toString() {
 		Iterator cacheIter = cache.entrySet().iterator();
-		System.out.println("\n\n");
+		String toReturn = "";
 		while(cacheIter.hasNext()) {
 			Map.Entry tuple = (Map.Entry) cacheIter.next();
 			LinkedList<OverlayNode> temp = (LinkedList<OverlayNode>) tuple.getValue();
-			System.out.print(tuple.getKey() + "===");
-			for(OverlayNode node : temp) {
-				System.out.print(node + "--->");
+			for(int i = 0; i < temp.size(); i++) {
+				OverlayNode nodeFrom = temp.get(i);
+
+				if(i == temp.size()-1) {
+					toReturn += nodeFrom.getIp()+":"+nodeFrom.getPort() +"\n";
+				}else {
+					OverlayNode nodeTo = temp.get(i+1);
+					int weight = weights.get(nodeFrom.getIp()+":"+nodeFrom.getPort()+"::"+nodeTo.getIp()+":"+nodeTo.getPort());
+					toReturn += nodeFrom.getIp() + ":" + nodeFrom.getPort()+"--"+weight+"--";
+				}
 			}
-			System.out.println("\n");
 
-		}System.out.println("\n\n");
-
+		}
+		return toReturn;
 	}
 
 	/**

@@ -69,7 +69,6 @@ public class EventFactory {
 				e = new TaskInitiate(din);
 				break;
 			case 8:
-				System.out.println("Parsing Task Complete");
 				e = new TaskComplete(din);
 				break;
 			case 9:

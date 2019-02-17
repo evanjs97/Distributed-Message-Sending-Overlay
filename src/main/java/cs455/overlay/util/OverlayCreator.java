@@ -74,7 +74,7 @@ public class OverlayCreator {
 			currCount = nodes[i].getCount();
 			while(currCount < connectionCount) {
 				int temp = (i + index) % nodes.length;
-				if(!nodes[temp].isFull()) {
+				if(!nodes[temp].isFull() && i != temp) {
 					weight = randomWeight();
 					nodes[i].addEdge(nodes[temp],true, weight);
 					nodes[temp].addEdge(nodes[i],false, weight);

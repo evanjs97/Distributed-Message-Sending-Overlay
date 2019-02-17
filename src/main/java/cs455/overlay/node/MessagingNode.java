@@ -9,16 +9,12 @@ import cs455.overlay.wireformats.*;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MessagingNode extends Node{
 
-	private ConcurrentHashMap<String, TCPSender> neighbors = new ConcurrentHashMap<>();
-	//private CopyOnWriteArrayList<TCPSender> neighbors = new CopyOnWriteArrayList<>();
+	private HashMap<String, TCPSender> neighbors = new HashMap<>();
 	private String regName;
 	private int regPort;
 	private ShortestPath graph;
@@ -62,7 +58,7 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void register() throws IOException{
-		System.out.println("Registering... on host: " + regName + ":" + regPort);
+		System.out.println("Registering with registry host on: " + regName + ":" + regPort);
 		Socket socket = new Socket(regName, regPort);
 		new TCPSender(socket).sendData(new Register(this.address, this.port).getBytes());
 		socket.close();
@@ -85,15 +81,14 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void neighborsOverlay(MessagingNodesList mnList) throws IOException{
-		neighbors = new ConcurrentHashMap<>();
-		System.out.println("Num Neighbors: " + mnList.getNumConnections());
 		for(OverlayNode node : mnList.getNodes()) {
-			System.out.println("Neighbor Nodes: "+ node.getIp() + " " + node.getPort());
 			Socket socket = new Socket(node.getIp(),node.getPort());
 			TCPSender sender = new TCPSender(socket);
-			neighbors.put(node.getIp() + ":"+node.getPort(),sender);
+			synchronized (neighbors) {
+				neighbors.put(node.getIp() + ":" + node.getPort(), sender);
+			}
 			new Thread(new TCPReceiverThread(socket,this)).start();
-			System.out.println(this.address + " Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
+			System.out.println(this.address + ": Establishing connection with: " + node.getIp() + " on port: " + node.getPort());
 			sender.sendData(new CreateLink(this.address,this.port).getBytes());
 		}
 		System.out.println("All connections are established. Number of connections: " + mnList.getNodes().size());
@@ -106,16 +101,17 @@ public class MessagingNode extends Node{
 	 */
 	private void startRounds(int rounds) throws IOException{
 
-		for(int i = 0; i < rounds; i++) {
+		for(int i = 0; i < rounds * 5; i++) {
 			LinkedList<OverlayNode> path = graph.getRandomShortestPath();
-			for(OverlayNode node : path) System.out.print(node.getIp() + ":" + node.getPort() + "->");
-			System.out.println();
-			OverlayNode dest = path.pollFirst();
-			synchronized (neighbors) {
+			try {
+				OverlayNode dest = path.pollFirst();
 				TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
 				Message msg = new Message(path);
 				sender.sendData(msg.getBytes());
 				statistics.sendMessage(msg.getPayload());
+			}catch(NullPointerException e) {
+				for(OverlayNode node : path) System.out.print(node.getIp() + ":" + node.getPort() + "->");
+				i--;
 			}
 
 		}
@@ -129,13 +125,9 @@ public class MessagingNode extends Node{
 	 * @throws IOException
 	 */
 	private void relayMessage(Message msg) throws IOException{
-		//System.out.println(msg);
 		OverlayNode dest = msg.nextDest();
-		//System.out.println(dest.getIp() + ":" + dest.getPort());
-		synchronized (neighbors) {
 			TCPSender sender = neighbors.get(dest.getIp() + ":" + dest.getPort());
 			sender.sendData(msg.getBytes());
-		}
 		statistics.relayMessage();
 	}
 
@@ -149,36 +141,37 @@ public class MessagingNode extends Node{
 		switch(event.getType()) {
 			case 2:
 				RegisterResponse regRes = (RegisterResponse) event;
-				System.out.println("Response received from register: status: " + regRes.getStatus() + ", " + regRes.getInfo());
+				System.out.println("Registration response received from register: status: " + regRes.getStatus() + ", " + regRes.getInfo());
 				break;
 			case 3:
 				MessagingNodesList mnList = (MessagingNodesList) event;
-				System.out.println("Overlay setup command received");
+				neighbors = new HashMap<>();
+				System.out.println("Neighbor overlay received from registry. Establishing connections...");
 				neighborsOverlay(mnList);
 				break;
 			case 4:
 				CreateLink link = (CreateLink) event;
-				System.out.println("Link connection established with: " + link.getIp() + " on port: " + link.getPort());
-				neighbors.put(link.getIp() + ":" + link.getPort(), new TCPSender(socket));
+				System.out.println("Link establish request received and approved from: " + link.getIp() + " on port: " + link.getPort());
+				synchronized (neighbors) {
+					neighbors.put(link.getIp() + ":" + link.getPort(), new TCPSender(socket));
+				}
 				break;
 			case 5:
 				LinkWeights lw = (LinkWeights) event;
-				System.out.println("Received link overlay");
+				System.out.println("Received link overlay from registry.");
 				graph = new ShortestPath(lw.getLinks(), this);
 				break;
 			case 6:
 				Message msg = (Message) event;
 				if(msg.relay())  {
-					//System.out.println("Relaying Message: " + msg.getPayload());
 					relayMessage(msg);
 				} else {
 					statistics.receivedMessage(msg.getPayload());
-					//System.out.println("Received Message: " + msg.getPayload());
 				}
 				break;
 			case 7:
 				TaskInitiate task = (TaskInitiate) event;
-				System.out.println("Starting rounds: " + task.getRounds());
+				System.out.println("Starting " + task.getRounds() + " rounds. 5 messages will be sent each round.");
 				startRounds(task.getRounds());
 				break;
 			case 9:
@@ -205,6 +198,9 @@ public class MessagingNode extends Node{
 						System.exit(0);
 					case "exit-overlay":
 						deregister();
+						break;
+					case "print-shortest-path":
+						System.out.println(graph);
 						break;
 				}
 			}

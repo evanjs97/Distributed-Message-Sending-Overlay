@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Registry extends Node{
 
-	private ConcurrentLinkedQueue<TrafficSummary> summary;
+	private Queue<TrafficSummary> summary;
 
-
+	private final AtomicInteger taskComplete = new AtomicInteger();
 	private Set<String> registeredNodes;
 	private AtomicInteger completedNodes = new AtomicInteger();
 	private OverlayNode[] overlay;
@@ -28,7 +28,7 @@ public class Registry extends Node{
 	 */
 	public Registry(int port) throws IOException {
 		super(port);
-		summary = new ConcurrentLinkedQueue<>();
+		summary = new LinkedList<>();
 		registeredNodes = Collections.synchronizedSet(new HashSet<String>());
 	}
 
@@ -42,17 +42,16 @@ public class Registry extends Node{
 	 */
 	private void registerNode(Register reg, Socket socket) throws IOException{
 
-		System.out.println("Register request received from: " + reg.getIp() +" on port: " + reg.getPort());
+
 		byte status = 0;
 		String info = "Successfully Registered!";
-//		!reg.getIp().equals(socket.getInetAddress().getHostAddress())
 		if(registeredNodes.contains(reg.getIp()+":"+reg.getPort())) {
 			status = 1;
 			info = "Registration failed, already registered";
 		}else {
 			registeredNodes.add(reg.getIp() + ":" + reg.getPort());
 		}
-
+		System.out.println("Registration request successful from node on: " + reg.getIp() + ":" + reg.getPort() +". The number of messaging nodes currently constituting the overlay is " + registeredNodes.size());
 		Socket sender = new Socket(reg.getIp(),reg.getPort());
 		new TCPSender(sender).sendData(new RegisterResponse(status, info).getBytes());
 	}
@@ -64,13 +63,14 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	private void deregisterNode(Deregister dreg, Socket socket) throws IOException {
-		System.out.println("Deregister request received from: " + dreg.getIp() +" on port: " + dreg.getPort());
+
 		if(registeredNodes.contains(dreg.getIp() + ":" + dreg.getPort()) || !dreg.getIp().equals(socket.getInetAddress().getHostAddress())) {
 			Socket sender = new Socket(dreg.getIp(),dreg.getPort());
 			byte status = 1;
 			new TCPSender(sender).sendData(new RegisterResponse(status, "De-registration failed, not registered").getBytes());
 		}else {
 			registeredNodes.remove(dreg.getIp());
+			System.out.println("Deregister request received from: " + dreg.getIp() +" on port: " + dreg.getPort() + ". Request Successful.");
 		}
 	}
 
@@ -187,23 +187,25 @@ public class Registry extends Node{
 	 * @throws IOException
 	 */
 	private void taskComplete(TaskComplete task) throws IOException, InterruptedException{
-//		synchronized (registeredNodes) {
 			if (registeredNodes.contains(task.getIp() + ":" + task.getPort())) {
 				int current = completedNodes.addAndGet(1);
 				System.out.println("TASKCOMPLETE: " + current);
 				if (current >= registeredNodes.size()) {
-					//Iterator nodeIter = registeredNodes.entrySet().iterator();
 					Thread.sleep(15000);
 					for (String address : registeredNodes) {
-						//Map.Entry tuple = (Map.Entry) nodeIter.next();
 						String[] arr = address.split(":");
 						new TCPSender(new Socket(arr[0], Integer.parseInt(arr[1]))).sendData(new PullTrafficSummary().getBytes());
 					}
 				}
 			}
-//		}
 	}
 
+	/**
+	 * pads a string to size, for use by printSummary
+	 * @param s the string to pad to size
+	 * @param size the size desired
+	 * @return s padded to size desired
+	 */
 	private static String padToSize(String s, int size) {
 		while(s.length() < size) {
 			s+= " ";
@@ -211,15 +213,11 @@ public class Registry extends Node{
 		return s;
 	}
 
+	/**
+	 * prints out the summary for the completed rounds
+	 */
 	private void printSummary() {
-		//size is 8,20, 23, 22, 26, 21
 		System.out.println("Node    # of messages sent  # of messages received  sum of sent messages  sum of received messages  # of messages relayed");
-//		System.out.println("+----------+----------+-------------+-----------------------+-----------------------+-----------+");
-//		System.out.println("|          |  Number  |  Number of  |   Summation of sent   | Summation of received | Number of |");
-//		System.out.println("|          |    of    |  messages   |       messages        |       messages        | messages  |");
-//		System.out.println("|          | messages |  received   |                       |                       | relayed   |");
-//		System.out.println("|          |   sent   |             |                       |                       |           |");
-//		System.out.println("+----------+----------+-------------+-----------------------+-----------------------+-----------+");
 		int current = 1;
 		int sendTrack = 0;
 		int receiveTrack = 0;
@@ -258,17 +256,20 @@ public class Registry extends Node{
 				deregisterNode(dreg, socket);
 				break;
 			case 8:
-				System.out.println("Received Task Complete");
 				try {
 					taskComplete((TaskComplete) event);
-				}catch(InterruptedException e) {
+				}catch (InterruptedException e) {
 					System.out.println(e);
 				}
+				//System.out.println("Received Task Complete from node at: " +  taskComplete.getIp() + ":" + taskComplete.getPort());
 				break;
 			case 10:
 				TrafficSummary traffic = (TrafficSummary) event;
+
+
 				synchronized (summary) {
 					summary.add(traffic);
+					System.out.println("Summary size is " + summary.size() + " nodes size is " + registeredNodes.size());
 					if (summary.size() == registeredNodes.size()) printSummary();
 				}
 				break;

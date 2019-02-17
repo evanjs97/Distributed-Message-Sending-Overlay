@@ -10,6 +10,7 @@ public class ShortestPath {
 	private RoutingCache cache = null;
 	Set<OverlayNode> nodes;
 	private OverlayNode start;
+	private final HashMap<String, Integer> weights;
 
 	/**
 	 * ShortestPath constructor, reconstructs overlay from edge list and finds shortest path to all other nodes
@@ -18,10 +19,12 @@ public class ShortestPath {
 	 */
 	public ShortestPath(LinkedList<OverlayEdge> edges, MessagingNode start) {
 		this.nodes = new HashSet<>();
-
+		HashMap<String, Integer> weights = new HashMap<>();
 		for(OverlayEdge edge : edges) {
 			OverlayNode node1 = edge.getEndpointFrom();
 			OverlayNode node2 = edge.getEndpointTo();
+			weights.put(node1.getIp()+":"+node1.getPort()+"::" + node2.getIp() + ":" + node2.getPort(), edge.getWeight());
+			weights.put(node2.getIp()+":"+node2.getPort()+"::" + node1.getIp() + ":" + node1.getPort(), edge.getWeight());
 			nodes.add(node1);
 			nodes.add(node2);
 			for(OverlayNode node : nodes) {
@@ -32,10 +35,14 @@ public class ShortestPath {
 			node1.addEdge(new OverlayEdge(node1,node2,true,edge.getWeight()));
 			node2.addEdge(new OverlayEdge(node2,node1,true,edge.getWeight()));
 
-
 		}
+		this.weights = weights;
 		dijkstra();
 		System.out.println("Link weights are received and processed. Ready to send messages.");
+	}
+
+	public String toString() {
+		return cache.toString();
 	}
 
 	public LinkedList<OverlayNode> getRandomShortestPath() {
@@ -71,12 +78,6 @@ public class ShortestPath {
 			 */
 			for(OverlayEdge edge : node.getEdges()) {
 				OverlayNode edgeNode = edge.getEndpointTo();
-//				if(edgeNode.equals(node)) edgeNode = edge.getEndpointFrom();
-//				boolean isInSet = false;
-//				for(OverlayNode nodeTest : set) {
-//					if(edgeNode.equals(nodeTest)) isInSet = true;
-//				}
-//				set.contains(node)
 				if(set.contains(edgeNode)) {
 					int dist = node.getDistance() + edge.getWeight();
 					if (dist < edgeNode.getDistance()) {
@@ -86,9 +87,8 @@ public class ShortestPath {
 				}
 			}
 		}
-		//nodes.remove(start);
-		cache = new RoutingCache(nodes,start);
-		cache.print();
+		cache = new RoutingCache(nodes,start, weights);
+		System.out.println(cache);
 	}
 
 
