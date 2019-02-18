@@ -173,7 +173,12 @@ public class Registry extends Node{
 							if (def >= registeredNodes.size()) def = registeredNodes.size() - 1;
 							try {
 								if (split.length > 1) {
-									def = Integer.parseInt(split[1]);
+
+									if(registeredNodes.size() <= def || (registeredNodes.size() * def) % 2 != 0 || (registeredNodes.size() == 1 && registeredNodes.size() > 2)) {
+										def = Integer.parseInt(split[1]);
+									}else {
+										System.out.println("Invalid number of links: Defaulting to 4 links");
+									}
 								} else {
 									System.out.println("Defaulting to " + def + " connections");
 								}
