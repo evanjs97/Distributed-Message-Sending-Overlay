@@ -1,10 +1,13 @@
 package cs455.overlay.util;
 
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class OverlayNode implements Comparable<OverlayNode>{
 	private String ip;
+	private String hostname;
 	private int port;
 	private int maxConnections;
 
@@ -21,21 +24,25 @@ public class OverlayNode implements Comparable<OverlayNode>{
 	 * @param port this node listens over
 	 * @param maxConnections exact number of connections this node should have
 	 */
-	public OverlayNode(String ip, int port, int maxConnections) {
+	public OverlayNode(String ip, int port, int maxConnections) throws UnknownHostException{
 		this.ip = ip;
+		this.hostname = InetAddress.getByName(ip).getHostName();
 		this.port = port;
 		this.connections = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.maxConnections = maxConnections;
 	}
 
-	public OverlayNode(String ip, int port) {
+	public OverlayNode(String ip, int port) throws UnknownHostException{
 		this.connections = new ArrayList<>();
 		this.edges = new ArrayList<>();
 		this.ip = ip;
+		this.hostname = InetAddress.getByName(ip).getHostName();
 		this.port = port;
 
 	}
+
+	public String getHostname() { return this.hostname; }
 
 	public void makeDijkstra() {
 		this.dijPrev = null;

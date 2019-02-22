@@ -108,9 +108,9 @@ public class MessagingNode extends Node{
 //			if(sender != null) {
 				for (int j = 0; j < 5; j++) {
 					Message msg = new Message(path);
-					//synchronized (sender) {
+					synchronized (sender) {
 						sender.sendData(msg.getBytes());
-					//}
+					}
 					statistics.sendMessage(msg.getPayload());
 				}
 //			}else i--;

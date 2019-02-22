@@ -7,7 +7,9 @@ import cs455.overlay.util.OverlayNode;
 import cs455.overlay.wireformats.*;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,7 +55,7 @@ public class Registry extends Node{
 		}else {
 			registeredNodes.add(reg.getIp() + ":" + reg.getPort());
 		}
-		System.out.println("Registration request successful from node on: " + reg.getIp() + ":" + reg.getPort() +". The number of messaging nodes currently constituting the overlay is " + numRegistered);
+		System.out.println("Registration request successful from node on: " + reg.getHostname() + ":" + reg.getPort() +". The number of messaging nodes currently constituting the overlay is " + numRegistered);
 		Socket sender = new Socket(reg.getIp(),reg.getPort());
 		new TCPSender(sender).sendData(new RegisterResponse(status, info).getBytes());
 	}
@@ -66,22 +68,28 @@ public class Registry extends Node{
 	 */
 	private void deregisterNode(Deregister dreg, Socket socket) throws IOException {
 
-		if(registeredNodes.contains(dreg.getIp() + ":" + dreg.getPort()) || !dreg.getIp().equals(socket.getInetAddress().getHostAddress())) {
-			Socket sender = new Socket(dreg.getIp(),dreg.getPort());
+		if(!registeredNodes.contains(dreg.getIp() + ":" + dreg.getPort()) || !dreg.getIp().equals(socket.getInetAddress().getHostAddress())) {
+			Socket sender = new Socket(dreg.getIp(), dreg.getPort());
+			byte status = 1;
+			new TCPSender(sender).sendData(new RegisterResponse(status, "De-registration failed, not registered").getBytes());
+		}else if(overlay != null) {
+			Socket sender = new Socket(dreg.getIp(), dreg.getPort());
 			byte status = 1;
 			new TCPSender(sender).sendData(new RegisterResponse(status, "De-registration failed, not registered").getBytes());
 		}else {
-			registeredNodes.remove(dreg.getIp());
-			System.out.println("Deregister request received from: " + dreg.getIp() +" on port: " + dreg.getPort() + ". Request Successful.");
+			registeredNodes.remove(dreg.getIp() + ":" + dreg.getPort());
+
+			System.out.println("Deregister request received from: " + dreg.getHostname() +" on port: " + dreg.getPort() + ". Request Successful.");
 		}
 	}
 
 	/**
 	 * Lists all registered nodes in format 'ip, port'
 	 */
-	private void listNodes() {
+	private void listNodes() throws UnknownHostException {
 		for(String address : registeredNodes) {
-			System.out.println(address);
+			String[] arr = address.split(":");
+			System.out.println(InetAddress.getByName(arr[0]).getHostName() + arr[1]);
 		}
 	}
 
@@ -114,6 +122,19 @@ public class Registry extends Node{
 	private void sendOverlay() throws IOException{
 		for(OverlayNode oNode : overlay) {
 			new TCPSender(new Socket(oNode.getIp(),oNode.getPort())).sendData(new MessagingNodesList(oNode.getEdges()).getBytes());
+		}
+	}
+
+	/**
+	 * lists all links in the overlay
+	 */
+	private void listWeights() {
+		for(OverlayEdge edge : OverlayCreator.getEdges(overlay)) {
+			OverlayNode from = edge.getEndpointFrom();
+			OverlayNode to = edge.getEndpointTo();
+			String fromAddr = from.getHostname() + ":" + from.getPort();
+			String toAddr = to.getHostname() + ":" + to.getPort();
+			System.out.println(fromAddr + "--->" + toAddr + ", weight: " + edge.getWeight());
 		}
 	}
 
@@ -169,15 +190,14 @@ public class Registry extends Node{
 							listNodes();
 							break;
 						case "setup-overlay":
-							int def = 4;
-							if (def >= registeredNodes.size()) def = registeredNodes.size() - 1;
+							int def = Math.min(registeredNodes.size()-1, 4);
 							try {
 								if (split.length > 1) {
-
-									if(registeredNodes.size() <= def || (registeredNodes.size() * def) % 2 != 0 || (registeredNodes.size() == 1 && registeredNodes.size() > 2)) {
-										def = Integer.parseInt(split[1]);
-									}else {
+									int input = Integer.parseInt(split[1]);
+									if(registeredNodes.size() <= input || (registeredNodes.size() * input) % 2 != 0 || (input == 1 && registeredNodes.size() > 2)) {
 										System.out.println("Invalid number of links: Defaulting to 4 links");
+									}else {
+										def = input;
 									}
 								} else {
 									System.out.println("Defaulting to " + def + " connections");
@@ -203,6 +223,11 @@ public class Registry extends Node{
 								System.err.println("Error: Please specify an int number of rounds as argument");
 							}
 							break;
+						case "list-weights":
+							if(overlay == null) {
+								System.err.println("Error: Can't list weights, overlay is not yet created.");
+							}else listWeights();
+							break;
 
 					}
 				}catch(InputMismatchException e) {
@@ -223,6 +248,7 @@ public class Registry extends Node{
 				int current = completedNodes.addAndGet(1);
 				System.out.println("TASKCOMPLETE: " + current);
 				if (current >= registeredNodes.size()) {
+					System.out.println("All tasks complete waiting 15 seconds before collecting traffic summary...");
 					Thread.sleep(15000);
 					for (String address : registeredNodes) {
 						String[] arr = address.split(":");
@@ -249,7 +275,7 @@ public class Registry extends Node{
 	 * prints out the summary for the completed rounds
 	 */
 	private void printSummary() {
-		System.out.println("Node    # of messages sent  # of messages received  sum of sent messages  sum of received messages  # of messages relayed");
+		System.out.println("Node                    # of messages sent  # of messages received  sum of sent messages  sum of received messages  # of messages relayed");
 		int current = 1;
 		int sendTrack = 0;
 		int receiveTrack = 0;
@@ -259,15 +285,16 @@ public class Registry extends Node{
 		for(TrafficSummary sum : summary) {
 			sendTrack += sum.getSendTracker(); receiveTrack += sum.getReceiveTracker(); relaytrack += sum.getRelayTracker();
 			sendSum += sum.getSendSummation(); receiveSum += sum.getReceiveSummation();
-			System.out.printf("Node %s%s%s%s%s%s\n",padToSize(""+current,3), padToSize(""+sum.getSendTracker(),20),
+			String host = sum.getHostname();
+			System.out.printf("%s%s%s%s%s%s\n",padToSize(host.substring(0, host.indexOf("."))+":"+sum.getPort(),24), padToSize(""+sum.getSendTracker(),20),
 					padToSize(""+sum.getReceiveTracker(),23),padToSize(""+sum.getSendSummation(),22),
 					padToSize(""+sum.getReceiveSummation(),26), padToSize(""+sum.getRelayTracker(),21));
-			//System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+			//System.out.println("+--------------+-------------+-----------------------+-----------------------+-----------+");
 			current++;
 		}
-		System.out.printf("Sum     %s%s%s%s%s\n", padToSize(""+sendTrack,20),padToSize(""+receiveTrack,23),
+		System.out.printf("Sum                     %s%s%s%s%s\n", padToSize(""+sendTrack,20),padToSize(""+receiveTrack,23),
 				padToSize(""+sendSum,22), padToSize(""+receiveSum,26), padToSize(""+relaytrack,21));
-		//System.out.println("+----------+-------------+-----------------------+-----------------------+-----------+");
+		//System.out.println("+--------------+-------------+-----------------------+-----------------------+-----------+");
 	}
 
 
