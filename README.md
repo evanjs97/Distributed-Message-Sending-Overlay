@@ -1,6 +1,6 @@
 ## CS455-Distributed Systems: Using Dijkstra’s Shortest Paths to Route Packets in a Network Overlay
 ### Author: Evan Steiner
-### Purpose: Building network overlay with multi..*node communication using dijkstra's shortest path to route packets
+### Purpose: Building network overlay with multi node communication using dijkstra's shortest path to route packets
 
 #### Instructions, Compilation/Running:
 * Compile on command line: "gradle build"
